@@ -7,6 +7,7 @@ import { toast } from 'react-toastify';
 import { MAX_ATTEMPTS, TILE_COUNT } from '../constants';
 import { useDailySeed } from '../hooks/useDailySeed';
 import { Guess, useGuessHistory } from '../hooks/useGuessHistory';
+import dayjs from 'dayjs';
 
 const FIRST_DAY_OF_FLAGLE = DateTime.fromFormat(
   'February 21 2022',
@@ -54,7 +55,8 @@ export function ShareButton() {
       score,
       guesses: dailyGuesses,
     });
-    return `#Flagle #${dateDiff.days} ${
+    const date = dayjs(trueDayString).format('DD.MM.YYYY');
+    return `#Flagle #${dateDiff.days} (${date}) ${
       score === 'DNF' ? 'X' : dailyGuesses.length
     }/${MAX_ATTEMPTS}\n${squareString}https://www.flagle.io`;
   }, [guessHistory, dailySeed]);
