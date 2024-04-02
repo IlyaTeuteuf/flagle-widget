@@ -2,12 +2,12 @@ import './App.css';
 import 'react-toastify/dist/ReactToastify.css';
 
 import Button from '@mui/material/Button';
-import { Twemoji } from '@teuteuf/react-emoji-render';
 import { lazy, Suspense, useEffect } from 'react';
 import { Redirect, Route, Switch } from 'react-router-dom';
 import { Flip, ToastContainer } from 'react-toastify';
 import styled from 'styled-components';
 
+import EmojiRender from './components/EmojiRender';
 import { HowToModal } from './components/HowToModal';
 import { NextRoundLink } from './components/NextRoundLink';
 import { SettingsLinkIcon } from './components/SettingsLinkIcon';
@@ -210,10 +210,9 @@ export function App() {
                 window.open('https://worldle.teuteuf.fr');
               }}
             >
-              <Twemoji
+              <EmojiRender
                 text="🌍"
                 className="inline-block"
-                options={{ baseUrl: '//twemoji.maxcdn.com/' }}
               />
               &nbsp;
               <span>Worldle</span>
@@ -224,10 +223,9 @@ export function App() {
                 window.open('https://wheretakenusa.teuteuf.fr');
               }}
             >
-              <Twemoji
+              <EmojiRender
                 text="🌍"
                 className="inline-block"
-                options={{ baseUrl: '//twemoji.maxcdn.com/' }}
               />
               &nbsp;
               <span>WhereTaken</span>

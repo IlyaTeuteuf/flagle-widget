@@ -1,9 +1,9 @@
-import { Twemoji } from '@teuteuf/react-emoji-render';
 import styled from 'styled-components';
 
 import { useDistanceInUserUnit } from '../hooks/useDistanceInUserUnit';
 import { Guess } from '../hooks/useGuessHistory';
 import { getDirectionEmoji } from '../utils/geography';
+import EmojiRender from './EmojiRender';
 
 const GuessLine = styled.div`
   display: grid;
@@ -70,9 +70,8 @@ export const GuessList: React.FC<{
           <CountryGuess>{guess.name}</CountryGuess>
           <DistanceBox>{formatDistance(guess.distance)} </DistanceBox>
           <ArrowBox>
-            <Twemoji
+            <EmojiRender
               text={getDirectionEmoji(guess)}
-              options={{ baseUrl: '//twemoji.maxcdn.com/' }}
             />
           </ArrowBox>
         </GuessLine>

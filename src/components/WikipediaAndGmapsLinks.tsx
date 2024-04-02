@@ -1,7 +1,7 @@
-import { Twemoji } from '@teuteuf/react-emoji-render';
 import styled from 'styled-components';
 
 import { useDailyCountryName } from '../hooks/useDailyCountryName';
+import EmojiRender from './EmojiRender';
 
 export const WikipediaAndMapsLinks = () => {
   const dailyCountryName = useDailyCountryName();
@@ -14,10 +14,9 @@ export const WikipediaAndMapsLinks = () => {
         target="_blank"
         rel="noopener noreferrer"
       >
-        <Twemoji
+        <EmojiRender
           text="👀"
           className="inline-block"
-          options={{ baseUrl: '//twemoji.maxcdn.com/' }}
         />{' '}
         on Google Maps
       </a>
@@ -27,10 +26,9 @@ export const WikipediaAndMapsLinks = () => {
         target="_blank"
         rel="noopener noreferrer"
       >
-        <Twemoji
+        <EmojiRender
           text="📚"
           className="inline-block"
-          options={{ baseUrl: '//twemoji.maxcdn.com/' }}
         />{' '}
         on Wikipedia
       </a>
