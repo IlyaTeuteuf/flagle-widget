@@ -192,6 +192,17 @@ export function App() {
           >
             Submit Feedback
           </a>
+          <div className="flex gap-1 justify-center items-center mt-2 w-full">
+              <a href="https://www.facebook.com/teuteufgames/" target="_blank" rel="noreferrer">
+                  <img src="/images/icons/facebook.png" width={36} height={36} alt="facebook" />
+              </a>
+              <a href="https://twitter.com/Worldle_Game" target="_blank" rel="noreferrer">
+                  <img src="/images/icons/twitter.png" width={36} height={36} alt="twitter" />
+              </a>
+              <a href="https://www.instagram.com/teuteufgames" target="_blank" rel="noreferrer">
+                  <img src="/images/icons/instagram.png" width={31} height={31} alt="instagram" />
+              </a>
+          </div>
           <div>Our other games:</div>
           <GamesContainer>
             <GameButton
