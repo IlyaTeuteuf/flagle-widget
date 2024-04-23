@@ -2,19 +2,16 @@ import { useEffect, useMemo } from 'react';
 import { toast } from 'react-toastify';
 import styled from 'styled-components';
 
+import { getCountryFlagSvgUrl } from '../api/fetchDataFromCDN';
 import { AdnginEndMobile0 } from '../components/AdnginEndMobile0';
 import { BackButton } from '../components/BackButton';
 import { BonusRoundTitle } from '../components/BonusRoundTitle';
 import { CorrectAnswers } from '../components/CorrectAnswers';
 import { NextRoundLink } from '../components/NextRoundLink';
 import { ShareButton } from '../components/ShareButton';
-import countryData from '../data/countries';
-import { useBorderCountryNames } from '../hooks/useBorderCountryCodes';
-import { useDailyCountryName } from '../hooks/useDailyCountryName';
 import { useDailySeed } from '../hooks/useDailySeed';
-import { useNearestCountryNames } from '../hooks/useNearestCountryNames';
-import { useRandomCountryNames } from '../hooks/useRandomCountryNames';
 import { ChoiceStatus, useRoundState } from '../hooks/useRoundState';
+import { useTodaysCountry } from '../providers/TodaysCountryProvider';
 import { shuffleWithSeed } from '../utils/shuffleWithSeed';
 
 const MAX_ATTEMPTS = 3;
@@ -29,35 +26,33 @@ const useSecondBonusRound = ({
   choicesCount: number;
   maxAttempts: number;
 }) => {
-  const dailyCountryName = useDailyCountryName();
-  const borderCountryNames = useBorderCountryNames(
-    countryData[dailyCountryName],
-  );
-  const randomBorderCountry = useMemo(
-    () => shuffleWithSeed(borderCountryNames, roundSeed).pop(),
-    [borderCountryNames, roundSeed],
-  );
-  const nearestCountryName = useNearestCountryNames({
-    name: dailyCountryName,
-    ...countryData[dailyCountryName],
-  })[1];
-  const correctAnswer = randomBorderCountry || nearestCountryName;
+  const { todaysCountry, countryList } = useTodaysCountry();
+
+  const randomBorderCountry = useMemo(() => {
+    const code = shuffleWithSeed(todaysCountry.borders, roundSeed).pop();
+    const country = countryList.find(
+      (c) => c.code.toLowerCase() === code?.toLowerCase(),
+    );
+    return country?.name || '';
+  }, [todaysCountry, roundSeed, countryList]);
+
+  const correctAnswer = randomBorderCountry;
+
   const blackList = useMemo(
-    () => [dailyCountryName, correctAnswer].filter(Boolean),
-    [dailyCountryName, correctAnswer],
+    () => [todaysCountry.code, ...todaysCountry.borders].filter(Boolean),
+    [todaysCountry],
   );
-  const randomCountryNames = useRandomCountryNames({
-    seed: roundSeed,
-    blackList,
-  });
-  const dailyChoicesOrder = useMemo(
-    () =>
-      shuffleWithSeed(
-        [...randomCountryNames.slice(0, choicesCount - 1), correctAnswer],
-        roundSeed,
-      ),
-    [randomCountryNames, choicesCount, correctAnswer, roundSeed],
-  );
+
+  const dailyChoicesOrder = useMemo(() => {
+    const blackListRemoved = countryList.filter(
+      (c) => !blackList.some((b) => b.toLowerCase() === c.code.toLowerCase()),
+    );
+    const shuffled = shuffleWithSeed(blackListRemoved, roundSeed);
+    const choices = shuffled.slice(0, choicesCount - 1).map((c) => c.name);
+    choices.push(correctAnswer);
+    return shuffleWithSeed(choices, roundSeed);
+  }, [countryList, roundSeed, choicesCount, correctAnswer, blackList]);
+
   const {
     dailyChoices,
     isRoundComplete,
@@ -94,8 +89,8 @@ const useSecondBonusRound = ({
 };
 
 export function BorderFlagGameRoute() {
+  const { todaysCountry, countryList } = useTodaysCountry();
   const roundSeed = useDailySeed('second-bonus-round');
-  const dailyCountryName = useDailyCountryName();
 
   const {
     dailyChoicesOrder,
@@ -128,17 +123,19 @@ export function BorderFlagGameRoute() {
         <BackButton />
       </BackButtonContainer>
       <BonusRoundTitle>
-        Pick the flag of a country that neighbours {dailyCountryName}
+        Pick the flag of a country that neighbours {todaysCountry.name}
       </BonusRoundTitle>
 
       <div className="grid grid-cols-4 gap-2 mt-3">
         {dailyChoicesOrder.map((countryName, index) => {
-          if (countryData[countryName]) {
+          if (countryList.findIndex((c) => c.name === countryName) !== -1) {
             return (
               <CountryFlag
                 key={countryName}
                 countryName={countryName}
-                countryCode={countryData[countryName].code.toUpperCase()}
+                countryCode={
+                  countryList.find((c) => c.name === countryName)?.code || ''
+                }
                 index={index + 1}
                 choiceStatus={
                   dailyChoices[countryName] ||
@@ -236,7 +233,7 @@ const CountryFlag: React.FC<{
         {index}.
       </div>
       <img
-        src={`https://flagcdn.com/w320/${countryCode.toLowerCase()}.png`}
+        src={getCountryFlagSvgUrl(countryCode)}
         width="70"
         height="70"
         alt=""

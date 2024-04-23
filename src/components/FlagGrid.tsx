@@ -1,9 +1,10 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import styled from 'styled-components';
+
+import { getCountryFlagSvgUrl } from '../api/fetchDataFromCDN';
 
 const DELAY_TIME = 0.5;
 const FLAG_WIDTH = 300;
-const FLAG_SCALE = FLAG_WIDTH / 640;
 
 const Grid = styled.div<{ end?: boolean }>`
   transition: 1s;
@@ -64,7 +65,6 @@ const FlagImage = styled.img<{
   flag: string;
   left: number;
   top: number;
-  height: number;
 }>`
   content: url(${(props) => props.flag});
   position: relative;
@@ -93,16 +93,24 @@ export function FlagGrid({
 }) {
   const [flagLoad, setFlagLoad] = useState(false);
   const [scaledFlagHeight, setScaledFlagHeight] = useState(0);
-  const flagImg = useMemo(() => {
-    const img = new Image();
-    img.onload = () => setFlagLoad(true);
-    img.src = `https://flagcdn.com/w640/${countryInfo.code}.png`;
-    return img;
-  }, [countryInfo]);
 
   useEffect(() => {
-    setScaledFlagHeight(Math.floor(FLAG_SCALE * flagImg.height));
-  }, [flagImg, flagLoad]);
+    // create invisible element to get accurate flag height
+    const img = new Image();
+    img.src = getCountryFlagSvgUrl(countryInfo.code);
+    img.width = FLAG_WIDTH;
+    img.style.visibility = 'hidden';
+    img.onload = () => {
+      setScaledFlagHeight(img.height);
+      setFlagLoad(true);
+      img.remove();
+    };
+    document.body.appendChild(img);
+    return () => {
+      img.onload = null;
+      img.remove();
+    };
+  }, [countryInfo]);
 
   return (
     <FlagContainer>
@@ -117,10 +125,10 @@ export function FlagGrid({
               <TileFront></TileFront>
               <TileBack>
                 <FlagImage
-                  flag={flagImg.src}
+                  flag={getCountryFlagSvgUrl(countryInfo.code)}
+                  width={FLAG_WIDTH}
                   left={-Math.floor((n % 3) * (FLAG_WIDTH / 3))}
                   top={-((Math.floor(n / 3) * scaledFlagHeight) / 2)}
-                  height={scaledFlagHeight}
                 ></FlagImage>
               </TileBack>
             </Tile>

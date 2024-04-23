@@ -15,6 +15,7 @@ import { StatsModal } from './components/StatsModal';
 import { Title, TitleBar, TitleBarDiv } from './components/Title';
 import { getDayString } from './hooks/useDailySeed';
 import { useMainGameCompleted } from './hooks/useMainGameCompleted';
+import { TodaysCountryProvider } from './providers/TodaysCountryProvider';
 import { MainGameRoute } from './routes/MainGameRoute/MainGameRoute';
 import { SettingsRoute } from './routes/SettingsRoute';
 
@@ -127,61 +128,63 @@ export function App() {
         autoClose={false}
       />
       <CentreWrapper className="App-Center">
-        <TitleBar>
-          <TitleBarDiv />
-          <TitleBarDiv justify="flex-end">
-            <HowToModal />
-          </TitleBarDiv>
-          <Title>
-            FLAG<span>LE</span>
-          </Title>
-          <TitleBarDiv>
-            <StatsModal />
-          </TitleBarDiv>
-          <TitleBarDiv>
-            <SettingsLinkIcon />
-          </TitleBarDiv>
-        </TitleBar>
+        <TodaysCountryProvider>
+          <TitleBar>
+            <TitleBarDiv />
+            <TitleBarDiv justify="flex-end">
+              <HowToModal />
+            </TitleBarDiv>
+            <Title>
+              FLAG<span>LE</span>
+            </Title>
+            <TitleBarDiv>
+              <StatsModal />
+            </TitleBarDiv>
+            <TitleBarDiv>
+              <SettingsLinkIcon />
+            </TitleBarDiv>
+          </TitleBar>
 
-        <Suspense fallback="loading next bonus round…">
-          <Switch>
-            <Route exact path="/">
-              <MainGameRoute />
-            </Route>
+          <Suspense fallback="loading next bonus round…">
+            <Switch>
+              <Route exact path="/">
+                <MainGameRoute />
+              </Route>
 
-            <Route exact path="/bonus-round/1">
-              {mainGameCompleted ? (
-                <LazyFirstBonusRoundRoute />
-              ) : (
-                <Redirect to="/" />
-              )}
-            </Route>
+              <Route exact path="/bonus-round/1">
+                {mainGameCompleted ? (
+                  <LazyFirstBonusRoundRoute />
+                ) : (
+                  <Redirect to="/" />
+                )}
+              </Route>
 
-            <Route exact path="/bonus-round/2">
-              {mainGameCompleted ? (
-                <LazySecondBonusRoundRoute />
-              ) : (
-                <Redirect to="/" />
-              )}
-            </Route>
+              <Route exact path="/bonus-round/2">
+                {mainGameCompleted ? (
+                  <LazySecondBonusRoundRoute />
+                ) : (
+                  <Redirect to="/" />
+                )}
+              </Route>
 
-            <Route exact path="/bonus-round/3">
-              {mainGameCompleted ? (
-                <LazyThirdBonusRoundRoute />
-              ) : (
-                <Redirect to="/" />
-              )}
-            </Route>
+              <Route exact path="/bonus-round/3">
+                {mainGameCompleted ? (
+                  <LazyThirdBonusRoundRoute />
+                ) : (
+                  <Redirect to="/" />
+                )}
+              </Route>
 
-            <Route exact path="/settings">
-              <SettingsRoute />
-            </Route>
+              <Route exact path="/settings">
+                <SettingsRoute />
+              </Route>
 
-            <Route>
-              <NextRoundLink to="/">Home</NextRoundLink>
-            </Route>
-          </Switch>
-        </Suspense>
+              <Route>
+                <NextRoundLink to="/">Home</NextRoundLink>
+              </Route>
+            </Switch>
+          </Suspense>
+        </TodaysCountryProvider>
 
         <AdContainer>
           <a
@@ -193,15 +196,42 @@ export function App() {
             Submit Feedback
           </a>
           <div className="flex gap-1 justify-center items-center mt-2 w-full">
-              <a href="https://www.facebook.com/teuteufgames/" target="_blank" rel="noreferrer">
-                  <img src="/images/icons/facebook.png" width={36} height={36} alt="facebook" />
-              </a>
-              <a href="https://twitter.com/Worldle_Game" target="_blank" rel="noreferrer">
-                  <img src="/images/icons/twitter.png" width={36} height={36} alt="twitter" />
-              </a>
-              <a href="https://www.instagram.com/teuteufgames" target="_blank" rel="noreferrer">
-                  <img src="/images/icons/instagram.png" width={31} height={31} alt="instagram" />
-              </a>
+            <a
+              href="https://www.facebook.com/teuteufgames/"
+              target="_blank"
+              rel="noreferrer"
+            >
+              <img
+                src="/images/icons/facebook.png"
+                width={36}
+                height={36}
+                alt="facebook"
+              />
+            </a>
+            <a
+              href="https://twitter.com/Worldle_Game"
+              target="_blank"
+              rel="noreferrer"
+            >
+              <img
+                src="/images/icons/twitter.png"
+                width={36}
+                height={36}
+                alt="twitter"
+              />
+            </a>
+            <a
+              href="https://www.instagram.com/teuteufgames"
+              target="_blank"
+              rel="noreferrer"
+            >
+              <img
+                src="/images/icons/instagram.png"
+                width={31}
+                height={31}
+                alt="instagram"
+              />
+            </a>
           </div>
           <div>Our other games:</div>
           <GamesContainer>
@@ -221,10 +251,7 @@ export function App() {
                 window.open('https://worldle.teuteuf.fr');
               }}
             >
-              <EmojiRender
-                text="🌍"
-                className="inline-block"
-              />
+              <EmojiRender text="🌍" className="inline-block" />
               &nbsp;
               <span>Worldle</span>
             </GameButton>
@@ -234,10 +261,7 @@ export function App() {
                 window.open('https://wheretakenusa.teuteuf.fr');
               }}
             >
-              <EmojiRender
-                text="🌍"
-                className="inline-block"
-              />
+              <EmojiRender text="🌍" className="inline-block" />
               &nbsp;
               <span>WhereTaken</span>
             </GameButton>

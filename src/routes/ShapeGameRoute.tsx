@@ -2,16 +2,15 @@ import React, { useEffect, useMemo } from 'react';
 import { toast } from 'react-toastify';
 import styled from 'styled-components';
 
+import { getCountryShapeSvgUrl } from '../api/fetchDataFromCDN';
 import { AdnginEndMobile0 } from '../components/AdnginEndMobile0';
 import { BackButton } from '../components/BackButton';
 import { BonusRoundTitle } from '../components/BonusRoundTitle';
 import { NextRoundLink } from '../components/NextRoundLink';
 import { ShareButton } from '../components/ShareButton';
-import countryData from '../data/countries';
-import { useDailyCountryName } from '../hooks/useDailyCountryName';
 import { useDailySeed } from '../hooks/useDailySeed';
-import { useRandomCountryNames } from '../hooks/useRandomCountryNames';
 import { ChoiceStatus, useRoundState } from '../hooks/useRoundState';
+import { useTodaysCountry } from '../providers/TodaysCountryProvider';
 import { shuffleWithSeed } from '../utils/shuffleWithSeed';
 
 const MAX_ATTEMPTS = 2;
@@ -26,20 +25,19 @@ const useFirstBonusRound = ({
   choicesCount: number;
   maxAttempts: number;
 }) => {
-  const dailyCountryName = useDailyCountryName();
-  const blackList = useMemo(() => [dailyCountryName], [dailyCountryName]);
-  const randomCountryNames = useRandomCountryNames({
-    seed: roundSeed,
-    blackList,
-  });
-  const dailyChoicesOrder = useMemo(
-    () =>
-      shuffleWithSeed(
-        [...randomCountryNames.slice(0, choicesCount - 1), dailyCountryName],
-        roundSeed,
-      ),
-    [randomCountryNames, dailyCountryName, roundSeed, choicesCount],
-  );
+  const { todaysCountry, countryList } = useTodaysCountry();
+  const blackList = useMemo(() => [todaysCountry.name], [todaysCountry]);
+
+  const dailyChoicesOrder = useMemo(() => {
+    const blackListRemoved = countryList.filter(
+      (c) => !blackList.includes(c.name),
+    );
+    const shuffled = shuffleWithSeed(blackListRemoved, roundSeed);
+    const choices = shuffled.slice(0, choicesCount - 1).map((c) => c.name);
+    choices.push(todaysCountry.name);
+    return shuffleWithSeed(choices, roundSeed);
+  }, [countryList, roundSeed, choicesCount, todaysCountry.name, blackList]);
+
   const {
     dailyChoices,
     isRoundComplete,
@@ -50,7 +48,7 @@ const useFirstBonusRound = ({
     seed: roundSeed,
     dailyChoicesOrder,
     maxAttempts,
-    correctAnswer: dailyCountryName,
+    correctAnswer: todaysCountry.name,
   });
 
   return useMemo(
@@ -61,7 +59,7 @@ const useFirstBonusRound = ({
       isRoundComplete,
       isRoundSuccess,
       attemptsLeft,
-      correctAnswer: dailyCountryName,
+      correctAnswer: todaysCountry.name,
     }),
     [
       dailyChoicesOrder,
@@ -70,14 +68,14 @@ const useFirstBonusRound = ({
       isRoundComplete,
       isRoundSuccess,
       attemptsLeft,
-      dailyCountryName,
+      todaysCountry,
     ],
   );
 };
 
 export const ShapeGameRoute: React.FC = () => {
+  const { todaysCountry, countryList } = useTodaysCountry();
   const roundSeed = useDailySeed('first-bonus-round');
-  const dailyCountryName = useDailyCountryName();
   const {
     dailyChoicesOrder,
     dailyChoices,
@@ -108,14 +106,18 @@ export const ShapeGameRoute: React.FC = () => {
       <BackButtonContainer>
         <BackButton />
       </BackButtonContainer>
-      <BonusRoundTitle>What's the shape of {dailyCountryName}?</BonusRoundTitle>
+      <BonusRoundTitle>
+        What's the shape of {todaysCountry.name}?
+      </BonusRoundTitle>
 
       <OutlineGrid>
         {dailyChoicesOrder.map((countryName, index) => (
           <CountryShape
             key={countryName}
             countryName={countryName}
-            countryCode={countryData[countryName].code}
+            countryCode={
+              countryList.find((c) => c.name === countryName)?.code || ''
+            }
             index={index + 1}
             choiceStatus={
               dailyChoices[countryName] ||
@@ -204,7 +206,7 @@ const CountryShape: React.FC<{
       <IndexShadow>{index}.</IndexShadow>
       <Index>{index}.</Index>
       <CountrySVG
-        src={`/images/countries/${countryCode.toLowerCase()}/vector.svg`}
+        src={getCountryShapeSvgUrl(countryCode)}
         width="120"
         height="120"
         alt=""

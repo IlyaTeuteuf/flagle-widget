@@ -5,7 +5,7 @@ import { useState } from 'react';
 import styled from 'styled-components';
 
 import { MAX_ATTEMPTS } from '../constants';
-import countryData from '../data/countries';
+import { useTodaysCountry } from '../providers/TodaysCountryProvider';
 import { BaseModal } from './BaseModal';
 import { FlagGrid } from './FlagGrid';
 import { GuessList } from './GuessList';
@@ -30,15 +30,18 @@ const HelpIcon = styled(HelpOutlineIcon)`
 `;
 
 export function HowToModal() {
+  const { countryList } = useTodaysCountry();
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
   const exampleGuesses = ['Mexico', 'Haiti', 'Peru', 'Chile'];
   const exampleTarget = 'Chile';
-  const { code: answerCode, ...answerGeo } = countryData[exampleTarget];
+  const answerCountry = countryList.find((c) => c.name === exampleTarget);
+  if (!answerCountry) return null;
+  const { code: answerCode, ...answerGeo } = answerCountry;
   const guesses = exampleGuesses.map((name) => {
-    const { ...guessGeo } = countryData[name];
+    const { ...guessGeo } = countryList.find((c) => c.name === name);
     return {
       name: name,
       distance: getDistance(guessGeo, answerGeo),
