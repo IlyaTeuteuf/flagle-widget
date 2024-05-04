@@ -17,6 +17,14 @@ import { shuffleWithSeed } from '../utils/shuffleWithSeed';
 const MAX_ATTEMPTS = 3;
 const CHOICES_COUNT = 8;
 
+// arrays of country codes that have the same flag
+const matchingFlags = [
+  ['fr', 'yt'],
+  ['nl', 'bq'],
+  ['no', 'sj', 'bv'],
+  ['au', 'hm'],
+];
+
 const useSecondBonusRound = ({
   roundSeed,
   choicesCount,
@@ -33,25 +41,59 @@ const useSecondBonusRound = ({
     const country = countryList.find(
       (c) => c.code.toLowerCase() === code?.toLowerCase(),
     );
-    return country?.name || '';
+    return country;
   }, [todaysCountry, roundSeed, countryList]);
 
-  const correctAnswer = randomBorderCountry;
-
-  const blackList = useMemo(
-    () => [todaysCountry.code, ...todaysCountry.borders].filter(Boolean),
-    [todaysCountry],
+  const correctAnswer = useMemo(
+    () => randomBorderCountry?.name || '',
+    [randomBorderCountry?.name],
   );
 
   const dailyChoicesOrder = useMemo(() => {
-    const blackListRemoved = countryList.filter(
-      (c) => !blackList.some((b) => b.toLowerCase() === c.code.toLowerCase()),
+    const choices = [
+      {
+        name: randomBorderCountry?.name,
+        code: randomBorderCountry?.code,
+      },
+    ];
+    const blackList = [todaysCountry.code, ...todaysCountry.borders];
+    const list = shuffleWithSeed(countryList, roundSeed);
+    let i = 0;
+    while (choices.length < choicesCount) {
+      const country = list[i];
+
+      if (country && !blackList.includes(country.code)) {
+        // don't allow more than one country from each matching flag group
+        const matchingFlagGroup = matchingFlags.find((a) =>
+          a.includes(country.code.toLowerCase()),
+        );
+
+        const isCountryInMatchingFlagGroup = choices.some((c) =>
+          matchingFlagGroup?.includes(c.code?.toLowerCase() ?? ''),
+        );
+
+        if (!matchingFlagGroup || !isCountryInMatchingFlagGroup) {
+          choices.push({
+            name: country.name,
+            code: country.code,
+          });
+        }
+      }
+      i++;
+    }
+    return shuffleWithSeed(
+      choices.map((c) => c.name || ''),
+      roundSeed,
     );
-    const shuffled = shuffleWithSeed(blackListRemoved, roundSeed);
-    const choices = shuffled.slice(0, choicesCount - 1).map((c) => c.name);
-    choices.push(correctAnswer);
-    return shuffleWithSeed(choices, roundSeed);
-  }, [countryList, roundSeed, choicesCount, correctAnswer, blackList]);
+  }, [
+    randomBorderCountry?.name,
+    randomBorderCountry?.code,
+    todaysCountry.code,
+    todaysCountry.borders,
+    countryList,
+    roundSeed,
+    choicesCount,
+  ]);
 
   const {
     dailyChoices,
