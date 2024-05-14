@@ -23,6 +23,7 @@ const matchingFlags = [
   ['nl', 'bq'],
   ['no', 'sj', 'bv'],
   ['au', 'hm'],
+  ['td', 'ro'],
 ];
 
 const useSecondBonusRound = ({
@@ -56,13 +57,17 @@ const useSecondBonusRound = ({
         code: randomBorderCountry?.code,
       },
     ];
-    const blackList = [todaysCountry.code, ...todaysCountry.borders];
+    const blackList = [
+      todaysCountry.code.toLowerCase(),
+      ...todaysCountry.borders.map((b) => b.toLowerCase()),
+    ];
     const list = shuffleWithSeed(countryList, roundSeed);
     let i = 0;
+
     while (choices.length < choicesCount) {
       const country = list[i];
 
-      if (country && !blackList.includes(country.code)) {
+      if (country && !blackList.includes(country.code.toLowerCase())) {
         // don't allow more than one country from each matching flag group
         const matchingFlagGroup = matchingFlags.find((a) =>
           a.includes(country.code.toLowerCase()),

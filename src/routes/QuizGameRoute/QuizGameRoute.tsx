@@ -93,11 +93,13 @@ export function QuizGameRoute() {
     [todaysCountry],
   );
 
-  const [{ selectedPopulation, selectedCurrency }, setRoundAnswsers] =
-    useLocalStorage(roundSeed, {
+  const [{ selectedPopulation }, setRoundAnswsers] = useLocalStorage(
+    roundSeed,
+    {
       selectedPopulation: undefined,
       selectedCurrency: undefined,
-    });
+    },
+  );
 
   const throwConfetti = useConfettiThrower();
   const selectPopulation = useCallback(

@@ -141,7 +141,7 @@ export function MainGameRoute() {
         tile: tileNum,
       });
     },
-    [addGuess, revealRandomTile, trueCountry, guesses],
+    [guesses, revealRandomTile, countryList, todaysCountry, addGuess],
   );
 
   return (

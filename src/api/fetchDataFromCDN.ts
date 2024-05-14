@@ -9,9 +9,10 @@ async function fetchJSONFromCDN(endpoint: string) {
   }
 
   // Fetch data, and cache it
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const data: any = await fetch(CDN_URL + endpoint)
     .then((res) => res.json())
-    .catch((e) => null);
+    .catch(() => null);
   _cache[endpoint] = data;
   return data;
 }
