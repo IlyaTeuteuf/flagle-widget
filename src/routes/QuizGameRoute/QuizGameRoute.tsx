@@ -29,6 +29,8 @@ const getPopulationChoices = ({ population }: { population: number }) => {
   let boundaries: number[] = [];
   let populationChoices: string[] = [];
 
+  if (typeof population === 'undefined') population = 0;
+
   if (population < 10_000) {
     // Micro countries
     populationChoices = ['Less than 25', '25 - 100', '100 - 2000', 'Over 2000'];
