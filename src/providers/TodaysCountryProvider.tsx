@@ -1,5 +1,12 @@
 import dayjs from 'dayjs';
-import { createContext, FC, useContext, useEffect, useState } from 'react';
+import {
+  createContext,
+  FC,
+  ReactNode,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 
 import {
   getCountries,
@@ -17,7 +24,9 @@ export const TodaysCountryContext = createContext<ITodaysCountryContext | null>(
   null,
 );
 
-export const TodaysCountryProvider: FC = ({ children }) => {
+export const TodaysCountryProvider: FC<{ children: ReactNode }> = ({
+  children,
+}) => {
   const [todaysCountry, setTodaysCountry] = useState<CountryData>({
     code: '',
     latitude: 0,

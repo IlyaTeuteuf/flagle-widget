@@ -105,7 +105,8 @@ export function QuizGameRoute() {
 
   const throwConfetti = useConfettiThrower();
   const selectPopulation = useCallback(
-    (e) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (e: any) => {
       const selectedPopulation =
         e.currentTarget.closest('button')?.dataset?.value;
 
@@ -257,8 +258,8 @@ export const Question: React.FC<{
                   selectedAnswer && choice === correctAnswer
                     ? ChoiceStatus.CORRECT
                     : selectedAnswer === choice
-                    ? ChoiceStatus.INCORRECT
-                    : undefined
+                      ? ChoiceStatus.INCORRECT
+                      : undefined
                 }
                 disabled={Boolean(selectedAnswer)}
                 onClick={onSelectAnswer}
@@ -287,8 +288,8 @@ const StyledButton = styled('button')<{
     choiceStatus === ChoiceStatus.CORRECT
       ? 'green !important'
       : choiceStatus === ChoiceStatus.INCORRECT
-      ? 'red !important'
-      : 'none'};
+        ? 'red !important'
+        : 'none'};
   color: ${({ choiceStatus }) =>
     choiceStatus === ChoiceStatus.CORRECT ? '#fff !important' : '#000'};
 

@@ -1,3 +1,4 @@
+import { ImageQuiz } from '@pla324/teuteuf-image-quiz';
 import { useEffect, useMemo } from 'react';
 import { toast } from 'react-toastify';
 import styled from 'styled-components';
@@ -10,7 +11,7 @@ import { CorrectAnswers } from '../components/CorrectAnswers';
 import { NextRoundLink } from '../components/NextRoundLink';
 import { ShareButton } from '../components/ShareButton';
 import { useDailySeed } from '../hooks/useDailySeed';
-import { ChoiceStatus, useRoundState } from '../hooks/useRoundState';
+import { useRoundState } from '../hooks/useRoundState';
 import { useTodaysCountry } from '../providers/TodaysCountryProvider';
 import { shuffleWithSeed } from '../utils/shuffleWithSeed';
 
@@ -164,6 +165,31 @@ export function BorderFlagGameRoute() {
     );
   }, [isRoundComplete, isRoundSuccess, correctAnswer]);
 
+  const startingGuesses = useMemo(
+    () =>
+      Object.entries(dailyChoices)
+        .map(([k, v]) => {
+          return typeof v !== 'undefined'
+            ? {
+                name: k,
+                image: getCountryFlagSvgUrl(
+                  countryList.find((c) => c.name === k)?.code || '',
+                ),
+              }
+            : null;
+        })
+        .filter((g) => g) as { name: string; image: string }[],
+    [countryList, dailyChoices],
+  );
+
+  const handleGuess = ({
+    guess,
+  }: {
+    guess: { name: string; image: string };
+  }) => {
+    onSelectCountry({} as never, guess.name);
+  };
+
   return (
     <>
       <BackButtonContainer>
@@ -173,33 +199,20 @@ export function BorderFlagGameRoute() {
         Pick the flag of a country that neighbours {todaysCountry.name}
       </BonusRoundTitle>
 
-      <div className="grid grid-cols-4 gap-2 mt-3">
-        {dailyChoicesOrder.map((countryName, index) => {
-          if (countryList.findIndex((c) => c.name === countryName) !== -1) {
-            return (
-              <CountryFlag
-                key={countryName}
-                countryName={countryName}
-                countryCode={
-                  countryList.find((c) => c.name === countryName)?.code || ''
-                }
-                index={index + 1}
-                choiceStatus={
-                  dailyChoices[countryName] ||
-                  (isRoundComplete && countryName === correctAnswer
-                    ? ChoiceStatus.CORRECT
-                    : undefined)
-                }
-                disabled={
-                  isRoundComplete || dailyChoices[countryName] !== undefined
-                }
-                onSelect={onSelectCountry}
-              />
-            );
-          } else {
-            console.error(countryName);
-          }
-        })}
+      <div className="max-w-lg mt-4">
+        <ImageQuiz
+          answerOptions={dailyChoicesOrder.map((countryName) => ({
+            name: countryName,
+            image: getCountryFlagSvgUrl(
+              countryList.find((c) => c.name === countryName)?.code || '',
+            ),
+          }))}
+          correctAnswer={correctAnswer}
+          getAnswerImage={(c) => c.image}
+          getAnswerText={(c) => c.name}
+          startingGuesses={startingGuesses}
+          onGuess={handleGuess}
+        />
       </div>
 
       {!isRoundComplete && (
@@ -235,57 +248,3 @@ const BackButtonContainer = styled.div`
   margin-bottom: 1rem;
   width: 100%;
 `;
-
-const CountryFlag: React.FC<{
-  countryName: string;
-  countryCode: string;
-  index: number;
-  onSelect: (e: React.MouseEvent<HTMLElement>) => void;
-  disabled: boolean;
-  choiceStatus: ChoiceStatus | undefined;
-}> = ({
-  countryName,
-  countryCode = '',
-  index = 0,
-  onSelect,
-  disabled = false,
-  choiceStatus,
-}) => {
-  return (
-    <button
-      key={countryName}
-      data-country-name={countryName}
-      onClick={onSelect}
-      disabled={disabled}
-      className="rounded-md p-3 relative"
-      style={{
-        border: '4px solid #CCC',
-        borderColor:
-          choiceStatus === ChoiceStatus.CORRECT
-            ? 'green'
-            : choiceStatus === ChoiceStatus.INCORRECT
-            ? 'red'
-            : '',
-        paddingTop: '24px',
-        paddingBottom: '24px',
-      }}
-    >
-      <div
-        className="font-bold absolute"
-        style={{ top: '4px', left: '8px', color: '#fff' }}
-      >
-        {index}.
-      </div>
-      <div className="font-bold absolute" style={{ top: '3px', left: '7px' }}>
-        {index}.
-      </div>
-      <img
-        src={getCountryFlagSvgUrl(countryCode)}
-        width="70"
-        height="70"
-        alt=""
-        style={{ border: '1px solid #CCC' }}
-      />
-    </button>
-  );
-};

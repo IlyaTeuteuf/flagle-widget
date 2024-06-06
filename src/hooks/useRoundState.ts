@@ -46,9 +46,9 @@ export const useRoundState = ({
   );
   const throwConfetti = useConfettiThrower();
   const onSelectCountry = useCallback(
-    (e: React.MouseEvent<HTMLElement>) => {
+    (e: React.MouseEvent<HTMLElement>, name?: string) => {
       const countryName =
-        e.currentTarget.closest('button')?.dataset?.countryName;
+        name || e.currentTarget.closest('button')?.dataset?.countryName;
 
       if (!countryName) {
         return;
