@@ -22,10 +22,7 @@ export const NextRoundLink: React.FC<PropsWithChildren<{ to: string }>> = ({
             style={{ backgroundColor: '#1a76d2' }}
             to={to}
           >
-            <EmojiRender
-              text="🎁"
-              className="inline-block"
-            />
+            <EmojiRender text="🎁" className="inline-block" />
             PLAY BONUS ROUND
           </Link>
         </div>

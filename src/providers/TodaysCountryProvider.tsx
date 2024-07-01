@@ -5,19 +5,23 @@ import {
   ReactNode,
   useContext,
   useEffect,
+  useMemo,
   useState,
 } from 'react';
 
 import {
+  getCities,
   getCountries,
   getCountryCode,
   getCountryData,
 } from '../api/fetchDataFromCDN';
-import { Country, CountryData } from '../types/game';
+import { City, Country, CountryData } from '../types/game';
 
 interface ITodaysCountryContext {
   todaysCountry: CountryData;
   countryList: Country[];
+  cityList: City[];
+  todaysCity?: City | null;
 }
 
 export const TodaysCountryContext = createContext<ITodaysCountryContext | null>(
@@ -51,7 +55,18 @@ export const TodaysCountryProvider: FC<{ children: ReactNode }> = ({
     },
     links: [],
   });
+
   const [countryList, setCountryList] = useState<Country[]>([]);
+
+  const [cityList, setCityList] = useState<City[]>([]);
+
+  const todaysCity = useMemo(
+    () =>
+      cityList.filter(
+        (c) => c.countryCode === todaysCountry.code && c.capital,
+      )[0],
+    [cityList, todaysCountry],
+  );
 
   useEffect(() => {
     const fetchTodaysCountry = async () => {
@@ -64,14 +79,21 @@ export const TodaysCountryProvider: FC<{ children: ReactNode }> = ({
       const countryList = await getCountries();
       setCountryList(countryList);
     };
+    const fetchCityList = async () => {
+      const cityList = await getCities();
+      setCityList(cityList);
+    };
     fetchTodaysCountry();
     fetchCountryList();
+    fetchCityList();
   }, []);
 
   if (!todaysCountry.name || !countryList.length) return null;
 
   return (
-    <TodaysCountryContext.Provider value={{ todaysCountry, countryList }}>
+    <TodaysCountryContext.Provider
+      value={{ todaysCountry, countryList, cityList, todaysCity }}
+    >
       {children}
     </TodaysCountryContext.Provider>
   );

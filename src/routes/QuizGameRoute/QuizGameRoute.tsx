@@ -80,7 +80,7 @@ const getPopulationChoices = ({ population }: { population: number }) => {
 
 export function QuizGameRoute() {
   const { todaysCountry } = useTodaysCountry();
-  const roundSeed = useDailySeed('third-bonus-round');
+  const roundSeed = useDailySeed('fourth-bonus-round');
   const {
     // currency_choices: currencyChoices,
     // currency_name: currencyCorrectAnswer,

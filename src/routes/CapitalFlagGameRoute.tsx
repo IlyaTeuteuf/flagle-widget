@@ -1,9 +1,9 @@
 import { ImageQuiz } from '@pla324/teuteuf-image-quiz';
 import { useEffect, useMemo } from 'react';
+import { useHistory } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import styled from 'styled-components';
 
-import { getCountryFlagSvgUrl } from '../api/fetchDataFromCDN';
 import { AdnginEndMobile0 } from '../components/AdnginEndMobile0';
 import { BackButton } from '../components/BackButton';
 import { BonusRoundTitle } from '../components/BonusRoundTitle';
@@ -18,16 +18,7 @@ import { shuffleWithSeed } from '../utils/shuffleWithSeed';
 const MAX_ATTEMPTS = 3;
 const CHOICES_COUNT = 8;
 
-// arrays of country codes that have the same flag
-const matchingFlags = [
-  ['fr', 'yt'],
-  ['nl', 'bq'],
-  ['no', 'sj', 'bv'],
-  ['au', 'hm'],
-  ['td', 'ro'],
-];
-
-const useThirdBonusRound = ({
+const useFourthBonusRound = ({
   roundSeed,
   choicesCount,
   maxAttempts,
@@ -36,70 +27,47 @@ const useThirdBonusRound = ({
   choicesCount: number;
   maxAttempts: number;
 }) => {
-  const { todaysCountry, countryList } = useTodaysCountry();
+  const history = useHistory();
+  const { todaysCountry, cityList, todaysCity } = useTodaysCountry();
 
-  const randomBorderCountry = useMemo(() => {
-    const code = shuffleWithSeed(todaysCountry.borders, roundSeed).pop();
-    const country = countryList.find(
-      (c) => c.code.toLowerCase() === code?.toLowerCase(),
-    );
-    return country;
-  }, [todaysCountry, roundSeed, countryList]);
+  if (!todaysCity?.flag) {
+    history.push('/');
+  }
 
   const correctAnswer = useMemo(
-    () => randomBorderCountry?.name || '',
-    [randomBorderCountry?.name],
+    () => (todaysCity ? todaysCity.names['en'] : ''),
+    [todaysCity],
   );
 
   const dailyChoicesOrder = useMemo(() => {
     const choices = [
       {
-        name: randomBorderCountry?.name,
-        code: randomBorderCountry?.code,
+        name: todaysCity?.names['en'],
+        code: todaysCountry.code,
       },
     ];
-    const blackList = [
-      todaysCountry.code.toLowerCase(),
-      ...todaysCountry.borders.map((b) => b.toLowerCase()),
-    ];
-    const list = shuffleWithSeed(countryList, roundSeed);
+
+    // Gets the cities with flags and then shuffles them as per the round seed
+    const list = shuffleWithSeed(
+      cityList.filter((c) => c.countryCode !== todaysCountry.code && c.flag),
+      roundSeed,
+    );
     let i = 0;
 
     while (choices.length < choicesCount) {
-      const country = list[i];
+      const city = list[i];
+      choices.push({
+        name: city.names['en'],
+        code: city.countryCode,
+      });
 
-      if (country && !blackList.includes(country.code.toLowerCase())) {
-        // don't allow more than one country from each matching flag group
-        const matchingFlagGroup = matchingFlags.find((a) =>
-          a.includes(country.code.toLowerCase()),
-        );
-
-        const isCountryInMatchingFlagGroup = choices.some((c) =>
-          matchingFlagGroup?.includes(c.code?.toLowerCase() ?? ''),
-        );
-
-        if (!matchingFlagGroup || !isCountryInMatchingFlagGroup) {
-          choices.push({
-            name: country.name,
-            code: country.code,
-          });
-        }
-      }
       i++;
     }
     return shuffleWithSeed(
       choices.map((c) => c.name || ''),
       roundSeed,
     );
-  }, [
-    randomBorderCountry?.name,
-    randomBorderCountry?.code,
-    todaysCountry.code,
-    todaysCountry.borders,
-    countryList,
-    roundSeed,
-    choicesCount,
-  ]);
+  }, [todaysCity, todaysCountry, cityList, roundSeed, choicesCount]);
 
   const {
     dailyChoices,
@@ -136,9 +104,10 @@ const useThirdBonusRound = ({
   );
 };
 
-export function BorderFlagGameRoute() {
-  const { todaysCountry, countryList, todaysCity } = useTodaysCountry();
-  const roundSeed = useDailySeed('third-bonus-round');
+export function CapitalFlagGameRoute() {
+  const { todaysCountry, cityList, todaysCity } = useTodaysCountry();
+
+  const roundSeed = useDailySeed('second-bonus-round');
 
   const {
     dailyChoicesOrder,
@@ -148,7 +117,7 @@ export function BorderFlagGameRoute() {
     isRoundSuccess,
     attemptsLeft,
     correctAnswer,
-  } = useThirdBonusRound({
+  } = useFourthBonusRound({
     roundSeed,
     choicesCount: CHOICES_COUNT,
     maxAttempts: MAX_ATTEMPTS,
@@ -172,14 +141,14 @@ export function BorderFlagGameRoute() {
           return typeof v !== 'undefined'
             ? {
                 name: k,
-                image: getCountryFlagSvgUrl(
-                  countryList.find((c) => c.name === k)?.code || '',
-                ),
+                image:
+                  'https://teuteuf-dashboard-assets.pages.dev' +
+                    cityList.find((c) => c.names['en'] === k)?.flag || '',
               }
             : null;
         })
         .filter((g) => g) as { name: string; image: string }[],
-    [countryList, dailyChoices],
+    [cityList, dailyChoices],
   );
 
   const handleGuess = ({
@@ -196,16 +165,17 @@ export function BorderFlagGameRoute() {
         <BackButton />
       </BackButtonContainer>
       <BonusRoundTitle>
-        Pick the flag of a country that neighbours {todaysCountry.name}
+        Pick the flag of the capital city of {todaysCountry.name}:{' '}
+        {todaysCity?.names['en']}
       </BonusRoundTitle>
 
       <div className="max-w-lg mt-4">
         <ImageQuiz
-          answerOptions={dailyChoicesOrder.map((countryName) => ({
-            name: countryName,
-            image: getCountryFlagSvgUrl(
-              countryList.find((c) => c.name === countryName)?.code || '',
-            ),
+          answerOptions={dailyChoicesOrder.map((cityName) => ({
+            name: cityName,
+            image:
+              'https://teuteuf-dashboard-assets.pages.dev' +
+                cityList.find((c) => c.names['en'] === cityName)?.flag || '',
           }))}
           correctAnswer={correctAnswer}
           getAnswerImage={(c) => c.image}
@@ -221,11 +191,12 @@ export function BorderFlagGameRoute() {
 
       {isRoundComplete && (
         <>
+          <div className="w-full flex justify-center mt-3">
+            <NextRoundLink to="/bonus-round/3">
+              Bonus Round - 3/4 - Pick the flag of a neighbouring country
+            </NextRoundLink>
+          </div>
           <CorrectAnswers answers={[correctAnswer]} />
-          <NextRoundLink to="/bonus-round/4">
-            Bonus Round - {todaysCity?.flag ? '3/4' : '3/3'} - Population
-          </NextRoundLink>
-
           <ShareButton />
         </>
       )}

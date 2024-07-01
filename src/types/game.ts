@@ -43,6 +43,7 @@ export interface City {
   };
   population?: number;
   sourceLink?: string;
+  flag?: string;
 }
 
 export interface Country {

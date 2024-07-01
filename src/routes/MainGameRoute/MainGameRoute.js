@@ -24,7 +24,7 @@ import { Attempts } from './components/Attempts';
 const TILE_INDICES = Array.from({ length: TILE_COUNT }, (_, i) => i);
 
 export function MainGameRoute() {
-  const { todaysCountry, countryList } = useTodaysCountry();
+  const { todaysCountry, countryList, todaysCity } = useTodaysCountry();
   const [score, setScore] = useState('DNF');
   const [flippedArray, setFlippedArray] = useState(Array(6).fill(false));
   const dayString = useDailySeed();
@@ -166,7 +166,8 @@ export function MainGameRoute() {
         <>
           <CorrectAnswers answers={[trueCountry]} />
           <NextRoundLink to="/bonus-round/1">
-            Bonus Round - 1/3 - Pick the country shape
+            Bonus Round - {todaysCity?.flag ? '1/4' : '1/3'} - Pick the country
+            shape
           </NextRoundLink>
 
           <ShareButton />

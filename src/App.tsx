@@ -76,15 +76,23 @@ const LazyFirstBonusRoundRoute = lazy(() =>
 
 const LazySecondBonusRoundRoute = lazy(() =>
   import(
-    /* webpackChunkName: "SecondBonusRoundRoute", webpackPreload: true */ './routes/BorderFlagGameRoute'
+    /* webpackChunkName: "LazySecondBonusRoundRoute", webpackPreload: true */ './routes/CapitalFlagGameRoute'
   ).then((module) => ({
-    default: module.BorderFlagGameRoute,
+    default: module.CapitalFlagGameRoute,
   })),
 );
 
 const LazyThirdBonusRoundRoute = lazy(() =>
   import(
-    /* webpackChunkName: "ThirdBonusRoundRoute", webpackPreload: true */ './routes/QuizGameRoute/QuizGameRoute'
+    /* webpackChunkName: "LazyThirdBonusRoundRoute", webpackPreload: true */ './routes/BorderFlagGameRoute'
+  ).then((module) => ({
+    default: module.BorderFlagGameRoute,
+  })),
+);
+
+const LazyFourthBonusRoundRoute = lazy(() =>
+  import(
+    /* webpackChunkName: "FourthBonusRoundRoute", webpackPreload: true */ './routes/QuizGameRoute/QuizGameRoute'
   ).then((module) => ({
     default: module.QuizGameRoute,
   })),
@@ -170,6 +178,14 @@ export function App() {
               <Route exact path="/bonus-round/3">
                 {mainGameCompleted ? (
                   <LazyThirdBonusRoundRoute />
+                ) : (
+                  <Redirect to="/" />
+                )}
+              </Route>
+
+              <Route exact path="/bonus-round/4">
+                {mainGameCompleted ? (
+                  <LazyFourthBonusRoundRoute />
                 ) : (
                   <Redirect to="/" />
                 )}

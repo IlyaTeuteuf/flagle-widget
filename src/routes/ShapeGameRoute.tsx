@@ -74,7 +74,7 @@ const useFirstBonusRound = ({
 };
 
 export const ShapeGameRoute: React.FC = () => {
-  const { todaysCountry, countryList } = useTodaysCountry();
+  const { todaysCountry, countryList, todaysCity } = useTodaysCountry();
   const roundSeed = useDailySeed('first-bonus-round');
   const {
     dailyChoicesOrder,
@@ -154,8 +154,10 @@ export const ShapeGameRoute: React.FC = () => {
 
       {isRoundComplete && (
         <>
-          <NextRoundLink to="/bonus-round/2">
-            Bonus Round - 2/3 - Pick the flag of a neighbouring country
+          <NextRoundLink to={`/bonus-round/${todaysCity?.flag ? 2 : 3}`}>
+            {todaysCity?.flag
+              ? 'Bonus Round - 2/4 - Pick the flag of the Capital'
+              : 'Bonus Round - 2/3 - Pick the flag of a neighbouring country'}
           </NextRoundLink>
 
           <ShareButton />
@@ -199,8 +201,8 @@ const CountryShape: React.FC<{
           choiceStatus === ChoiceStatus.CORRECT
             ? 'green'
             : choiceStatus === ChoiceStatus.INCORRECT
-            ? 'red'
-            : '',
+              ? 'red'
+              : '',
       }}
     >
       <IndexShadow>{index}.</IndexShadow>
