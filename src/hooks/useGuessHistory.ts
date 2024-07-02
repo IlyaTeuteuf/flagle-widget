@@ -18,7 +18,7 @@ export function useGuessHistory() {
   const [guesses, setGuesses] = useLocalStorage<GuessHistory>('guesses', {});
 
   const addGuess = useCallback(
-    (newGuess) => {
+    (newGuess: Guess) => {
       setGuesses((currGuesses) => ({
         ...currGuesses,
         [dailySeed]: [...(currGuesses[dailySeed] || []), newGuess],

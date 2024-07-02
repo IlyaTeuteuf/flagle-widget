@@ -11,7 +11,7 @@ export const NextRoundLink: React.FC<PropsWithChildren<{ to: string }>> = ({
   return (
     <div className="animate-pop mb-3 mt-3">
       <div className="p-2 w-full flex flex-col justify-center items-center gap-2 rounded-sm animate-reveal">
-        <div className="p-2 flex flex-col bg-slate-500 bg-opacity-10 dark:bg-white w-full text-black rounded-lg">
+        <div className="p-2 flex flex-col bg-slate-500 bg-opacity-10 w-full text-black rounded-lg">
           <div className="w-full flex justify-center items-center mb-2 mt-1 font-bold gap-1">
             <EmojiRender text="★" className="inline-block text-orange-700" />
             <Title>{children}</Title>
@@ -22,10 +22,7 @@ export const NextRoundLink: React.FC<PropsWithChildren<{ to: string }>> = ({
             style={{ backgroundColor: '#1a76d2' }}
             to={to}
           >
-            <EmojiRender
-              text="🎁"
-              className="inline-block"
-            />
+            <EmojiRender text="🎁" className="inline-block" />
             PLAY BONUS ROUND
           </Link>
         </div>

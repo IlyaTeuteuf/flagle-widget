@@ -15,19 +15,19 @@ const Container = styled.div`
   padding: 0 8px;
   margin-bottom: 1rem;
   max-width: 376px;
-  transition: transform 0.4s ease-in-out, height 0.5s ease-in-out;
+  transition:
+    transform 0.4s ease-in-out,
+    height 0.5s ease-in-out;
 
-  ${props => props.disabled && css`
-    transform: scale(0);
-    height: 0;
-  `}
+  ${(props) =>
+    props.disabled &&
+    css`
+      transform: scale(0);
+      height: 0;
+    `}
 `;
 
-export const AnswerBox = ({
-  disabled,
-  countries,
-  onGuess,
-}) => {
+export const AnswerBox = ({ disabled, countries, onGuess }) => {
   const [selectedOption, setSelectedOption] = useState(null);
 
   const handleSubmit = (guess) => {

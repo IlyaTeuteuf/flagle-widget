@@ -70,9 +70,7 @@ export const GuessList: React.FC<{
           <CountryGuess>{guess.name}</CountryGuess>
           <DistanceBox>{formatDistance(guess.distance)} </DistanceBox>
           <ArrowBox>
-            <EmojiRender
-              text={getDirectionEmoji(guess)}
-            />
+            <EmojiRender text={getDirectionEmoji(guess)} />
           </ArrowBox>
         </GuessLine>
       ))}

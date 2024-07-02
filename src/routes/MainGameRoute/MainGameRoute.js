@@ -13,12 +13,10 @@ import {
   TILE_COUNT,
   TILES_REVEALED_AT_START,
 } from '../../constants';
-import countryData from '../../data/countries';
-import { useAllCountryNames } from '../../hooks/useAllCountryNames';
 import { useConfettiThrower } from '../../hooks/useConfettiThrower';
-import { useDailyCountryName } from '../../hooks/useDailyCountryName';
 import { useDailySeed } from '../../hooks/useDailySeed';
 import { useGuessHistory } from '../../hooks/useGuessHistory';
+import { useTodaysCountry } from '../../providers/TodaysCountryProvider';
 import { shuffleWithSeed } from '../../utils/shuffleWithSeed';
 import { AnswerBox } from './components/AnswerBox';
 import { Attempts } from './components/Attempts';
@@ -26,6 +24,7 @@ import { Attempts } from './components/Attempts';
 const TILE_INDICES = Array.from({ length: TILE_COUNT }, (_, i) => i);
 
 export function MainGameRoute() {
+  const { todaysCountry, countryList, todaysCity } = useTodaysCountry();
   const [score, setScore] = useState('DNF');
   const [flippedArray, setFlippedArray] = useState(Array(6).fill(false));
   const dayString = useDailySeed();
@@ -39,8 +38,12 @@ export function MainGameRoute() {
     [guessHistory, dayString],
   );
 
-  const trueCountry = useDailyCountryName();
-  const allCountryNames = useAllCountryNames();
+  const trueCountry = useMemo(() => todaysCountry.name, [todaysCountry]);
+
+  const allCountryNames = useMemo(
+    () => countryList.map((c) => c.name),
+    [countryList],
+  );
 
   const revealRandomTile = useCallback(() => {
     const [tile] = randomOrder;
@@ -129,8 +132,8 @@ export function MainGameRoute() {
         return toast(`You have already guessed ${guess}`, { autoClose: 3000 });
       }
       const tileNum = revealRandomTile();
-      const { ...guessGeo } = countryData[guess];
-      const { ...answerGeo } = countryData[trueCountry];
+      const { ...guessGeo } = countryList.find((c) => c.name === guess);
+      const { ...answerGeo } = todaysCountry;
       addGuess({
         name: guess,
         distance: getDistance(guessGeo, answerGeo),
@@ -138,16 +141,14 @@ export function MainGameRoute() {
         tile: tileNum,
       });
     },
-    [addGuess, revealRandomTile, trueCountry, guesses],
+    [guesses, revealRandomTile, countryList, todaysCountry, addGuess],
   );
-
-  const countryInfo = useMemo(() => countryData[trueCountry], [trueCountry]);
 
   return (
     <>
       <FlagGrid
         end={end}
-        countryInfo={countryInfo}
+        countryInfo={{ code: todaysCountry.code }}
         flippedArray={flippedArray}
       ></FlagGrid>
       <p className="mb-2 text-sm">
@@ -165,7 +166,8 @@ export function MainGameRoute() {
         <>
           <CorrectAnswers answers={[trueCountry]} />
           <NextRoundLink to="/bonus-round/1">
-            Bonus Round - 1/3 - Pick the country shape
+            Bonus Round - {todaysCity?.flag ? '1/4' : '1/3'} - Pick the country
+            shape
           </NextRoundLink>
 
           <ShareButton />

@@ -7,50 +7,110 @@ import { BackButton } from '../../components/BackButton';
 import { BonusRoundTitle } from '../../components/BonusRoundTitle';
 import { ShareButton } from '../../components/ShareButton';
 import { WikipediaAndMapsLinks } from '../../components/WikipediaAndGmapsLinks';
-import countryData from '../../data/countries';
-import { countriesCurrencyAndPopulation } from '../../domain/countries.currencyAndPopulation';
 import { useConfettiThrower } from '../../hooks/useConfettiThrower';
-import { useDailyCountryName } from '../../hooks/useDailyCountryName';
 import { useDailySeed } from '../../hooks/useDailySeed';
 import { ChoiceStatus } from '../../hooks/useRoundState';
+import { useTodaysCountry } from '../../providers/TodaysCountryProvider';
 import { refreshCompleteAd } from '../../utils/ads';
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-unused-vars
-const { ReactComponent: CurrencyIcon } = require('./CurrencyIcon.svg');
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+// const { ReactComponent: CurrencyIcon } = require('./CurrencyIcon.svg');
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { ReactComponent: PopulationIcon } = require('./PopulationIcon.svg');
 
+function getPopulationAnswerIndex(actual: number, boundaries: number[]) {
+  if (actual < boundaries[0]) return 0;
+  if (actual < boundaries[1]) return 1;
+  if (actual < boundaries[2]) return 2;
+  return 3;
+}
+
+const getPopulationChoices = ({ population }: { population: number }) => {
+  let boundaries: number[] = [];
+  let populationChoices: string[] = [];
+
+  if (typeof population === 'undefined') population = 0;
+
+  if (population < 10_000) {
+    // Micro countries
+    populationChoices = ['Less than 25', '25 - 100', '100 - 2000', 'Over 2000'];
+    boundaries = [25, 100, 2000];
+  } else if (population < 2.5 * 1_000_000) {
+    // Small countries
+    populationChoices = [
+      '< 50 thousand',
+      '50 - 500 thousand',
+      '500k - 1 million',
+      '1+ million',
+    ];
+    boundaries = [50_000, 500_000, 1_000_000];
+  } else if (population < 10 * 1_000_000) {
+    // Medium countries
+    populationChoices = [
+      '< 3 million',
+      '3 - 5 million',
+      '5 - 8 million',
+      '8+ million',
+    ];
+    boundaries = [3_000_000, 5_000_000, 8_000_000];
+  } else if (population < 50 * 1_000_000) {
+    // Large countries
+    populationChoices = [
+      '< 15 million',
+      '15 - 25 million',
+      '25 - 35 million',
+      '35+ million',
+    ];
+    boundaries = [15_000_000, 25_000_000, 35_000_000];
+  } else {
+    // Massive countries
+    populationChoices = [
+      '< 60 million',
+      '60 - 80 million',
+      '80 - 100 million',
+      '100+ million',
+    ];
+    boundaries = [60_000_000, 80_000_000, 100_000_000];
+  }
+
+  const populationAnswer =
+    populationChoices[getPopulationAnswerIndex(population, boundaries)];
+  return { boundaries, populationChoices, populationAnswer };
+};
+
 export function QuizGameRoute() {
-  const dailyCountryName = useDailyCountryName();
-  const roundSeed = useDailySeed('third-bonus-round');
+  const { todaysCountry } = useTodaysCountry();
+  const roundSeed = useDailySeed('fourth-bonus-round');
   const {
     // currency_choices: currencyChoices,
     // currency_name: currencyCorrectAnswer,
     // currency_code,
-    population_choices: populationChoices,
-    population_answer: populationCorrectAnswer,
+    populationChoices,
+    populationAnswer,
   } = useMemo(
     () =>
-      countriesCurrencyAndPopulation[
-        countryData[dailyCountryName].code.toUpperCase()
-      ],
-    [dailyCountryName],
+      getPopulationChoices({
+        population: todaysCountry.population,
+      }),
+    [todaysCountry],
   );
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [{ selectedPopulation, selectedCurrency }, setRoundAnswsers] =
-    useLocalStorage(roundSeed, {
+  const [{ selectedPopulation }, setRoundAnswsers] = useLocalStorage(
+    roundSeed,
+    {
       selectedPopulation: undefined,
       selectedCurrency: undefined,
-    });
+    },
+  );
 
   const throwConfetti = useConfettiThrower();
   const selectPopulation = useCallback(
-    (e) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (e: any) => {
       const selectedPopulation =
         e.currentTarget.closest('button')?.dataset?.value;
 
-      if (selectedPopulation === populationCorrectAnswer) {
+      if (selectedPopulation === populationAnswer) {
         throwConfetti();
       }
 
@@ -59,7 +119,7 @@ export function QuizGameRoute() {
         selectedPopulation,
       }));
     },
-    [setRoundAnswsers, throwConfetti, populationCorrectAnswer],
+    [setRoundAnswsers, throwConfetti, populationAnswer],
   );
   // const selectCurrency = useCallback(
   //   (e) => {
@@ -93,7 +153,7 @@ export function QuizGameRoute() {
 
       <div className="flex flex-row flex-wrap w-full pb-4 gap-2 max-w-lg">
         <Question
-          title={`What is the estimated population of ${dailyCountryName}?`}
+          title={`What is the estimated population of ${todaysCountry.name}?`}
           icon={
             <PopulationIcon
               width="80"
@@ -103,7 +163,7 @@ export function QuizGameRoute() {
           }
           choices={populationChoices}
           selectedAnswer={selectedPopulation}
-          correctAnswer={populationCorrectAnswer}
+          correctAnswer={populationAnswer}
           onSelectAnswer={selectPopulation}
         />
         {/* {selectedPopulation && (
@@ -198,8 +258,8 @@ export const Question: React.FC<{
                   selectedAnswer && choice === correctAnswer
                     ? ChoiceStatus.CORRECT
                     : selectedAnswer === choice
-                    ? ChoiceStatus.INCORRECT
-                    : undefined
+                      ? ChoiceStatus.INCORRECT
+                      : undefined
                 }
                 disabled={Boolean(selectedAnswer)}
                 onClick={onSelectAnswer}
@@ -228,8 +288,8 @@ const StyledButton = styled('button')<{
     choiceStatus === ChoiceStatus.CORRECT
       ? 'green !important'
       : choiceStatus === ChoiceStatus.INCORRECT
-      ? 'red !important'
-      : 'none'};
+        ? 'red !important'
+        : 'none'};
   color: ${({ choiceStatus }) =>
     choiceStatus === ChoiceStatus.CORRECT ? '#fff !important' : '#000'};
 

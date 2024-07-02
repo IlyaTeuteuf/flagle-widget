@@ -1,37 +1,46 @@
+import { useMemo } from 'react';
 import styled from 'styled-components';
 
-import { useDailyCountryName } from '../hooks/useDailyCountryName';
+import { useTodaysCountry } from '../providers/TodaysCountryProvider';
 import EmojiRender from './EmojiRender';
 
 export const WikipediaAndMapsLinks = () => {
-  const dailyCountryName = useDailyCountryName();
+  const { todaysCountry } = useTodaysCountry();
+
+  const googleMapsUrl = useMemo(() => {
+    return todaysCountry.links
+      .find((link) => link.type === 'GoogleMaps')
+      ?.url.replace('${cc}', 'en');
+  }, [todaysCountry.links]);
+
+  const wikipediaUrl = useMemo(() => {
+    return todaysCountry.links
+      .find((link) => link.type === 'Wikipedia')
+      ?.url.replace('${cc}', 'en');
+  }, [todaysCountry.links]);
 
   return (
     <LinksWrapper>
-      <a
-        className="underline text-center block mt-4 whitespace-nowrap"
-        href={`https://www.google.com/maps?q=${dailyCountryName}`}
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        <EmojiRender
-          text="👀"
-          className="inline-block"
-        />{' '}
-        on Google Maps
-      </a>
-      <a
-        className="underline text-center block mt-4 whitespace-nowrap"
-        href={`https://en.wikipedia.org/wiki/${dailyCountryName}`}
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        <EmojiRender
-          text="📚"
-          className="inline-block"
-        />{' '}
-        on Wikipedia
-      </a>
+      {googleMapsUrl && (
+        <a
+          className="underline text-center block mt-4 whitespace-nowrap"
+          href={googleMapsUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <EmojiRender text="👀" className="inline-block" /> on Google Maps
+        </a>
+      )}
+      {wikipediaUrl && (
+        <a
+          className="underline text-center block mt-4 whitespace-nowrap"
+          href={wikipediaUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <EmojiRender text="📚" className="inline-block" /> on Wikipedia
+        </a>
+      )}
     </LinksWrapper>
   );
 };
