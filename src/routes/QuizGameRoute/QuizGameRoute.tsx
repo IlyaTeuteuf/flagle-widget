@@ -15,7 +15,7 @@ import { useDailySeed } from '../../hooks/useDailySeed';
 import { ChoiceStatus } from '../../hooks/useRoundState';
 import { refreshCompleteAd } from '../../utils/ads';
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+// eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-unused-vars
 const { ReactComponent: CurrencyIcon } = require('./CurrencyIcon.svg');
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { ReactComponent: PopulationIcon } = require('./PopulationIcon.svg');
@@ -37,6 +37,7 @@ export function QuizGameRoute() {
     [dailyCountryName],
   );
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [{ selectedPopulation, selectedCurrency }, setRoundAnswsers] =
     useLocalStorage(roundSeed, {
       selectedPopulation: undefined,

@@ -125,6 +125,7 @@ export function getCountry(dayString: string) {
     }
 
     if (areas[pickedCountry.code] < smallCountryLimit) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       smallCountryCooldown = 7;
     }
 
