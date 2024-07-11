@@ -1,3 +1,4 @@
+import { MultipleChoiceQuiz } from '@pla324/teuteuf-multiple-choice-quiz';
 import { ReactElement, useCallback, useEffect, useMemo, useRef } from 'react';
 import { MobileView } from 'react-device-detect';
 import styled from 'styled-components';
@@ -9,12 +10,11 @@ import { ShareButton } from '../../components/ShareButton';
 import { WikipediaAndMapsLinks } from '../../components/WikipediaAndGmapsLinks';
 import { useConfettiThrower } from '../../hooks/useConfettiThrower';
 import { useDailySeed } from '../../hooks/useDailySeed';
-import { ChoiceStatus } from '../../hooks/useRoundState';
 import { useTodaysCountry } from '../../providers/TodaysCountryProvider';
 import { refreshCompleteAd } from '../../utils/ads';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-// const { ReactComponent: CurrencyIcon } = require('./CurrencyIcon.svg');
+const { ReactComponent: CurrencyIcon } = require('./CurrencyIcon.svg');
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { ReactComponent: PopulationIcon } = require('./PopulationIcon.svg');
 
@@ -78,16 +78,29 @@ const getPopulationChoices = ({ population }: { population: number }) => {
   return { boundaries, populationChoices, populationAnswer };
 };
 
+const getCurrencyData = ({
+  currencyData,
+}: {
+  currencyData:
+    | {
+        code: string;
+        name: string;
+        nameChoices: string[];
+      }
+    | undefined
+    | null;
+}) => {
+  return {
+    currencyCorrectCode: currencyData?.code,
+    currencyCorrectAnswer: currencyData?.name,
+    currencyChoices: currencyData?.nameChoices,
+  };
+};
+
 export function QuizGameRoute() {
   const { todaysCountry } = useTodaysCountry();
   const roundSeed = useDailySeed('fourth-bonus-round');
-  const {
-    // currency_choices: currencyChoices,
-    // currency_name: currencyCorrectAnswer,
-    // currency_code,
-    populationChoices,
-    populationAnswer,
-  } = useMemo(
+  const { populationChoices, populationAnswer } = useMemo(
     () =>
       getPopulationChoices({
         population: todaysCountry.population,
@@ -95,21 +108,22 @@ export function QuizGameRoute() {
     [todaysCountry],
   );
 
-  const [{ selectedPopulation }, setRoundAnswsers] = useLocalStorage(
-    roundSeed,
-    {
+  const { currencyCorrectCode, currencyCorrectAnswer, currencyChoices } =
+    useMemo(
+      () => getCurrencyData({ currencyData: todaysCountry.currencyData }),
+      [todaysCountry],
+    );
+
+  const [{ selectedPopulation, selectedCurrency }, setRoundAnswsers] =
+    useLocalStorage(roundSeed, {
       selectedPopulation: undefined,
       selectedCurrency: undefined,
-    },
-  );
+    });
 
   const throwConfetti = useConfettiThrower();
   const selectPopulation = useCallback(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (e: any) => {
-      const selectedPopulation =
-        e.currentTarget.closest('button')?.dataset?.value;
-
+    (selectedPopulation: any) => {
       if (selectedPopulation === populationAnswer) {
         throwConfetti();
       }
@@ -121,22 +135,20 @@ export function QuizGameRoute() {
     },
     [setRoundAnswsers, throwConfetti, populationAnswer],
   );
-  // const selectCurrency = useCallback(
-  //   (e) => {
-  //     const selectedCurrency =
-  //       e.currentTarget.closest('button')?.dataset?.value;
+  const selectCurrency = useCallback(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (selectedCurrency: any) => {
+      if (selectedCurrency === currencyCorrectAnswer) {
+        throwConfetti();
+      }
 
-  //     if (selectedCurrency === currencyCorrectAnswer) {
-  //       throwConfetti();
-  //     }
-
-  //     setRoundAnswsers((roundAnswers) => ({
-  //       ...roundAnswers,
-  //       selectedCurrency,
-  //     }));
-  //   },
-  //   [setRoundAnswsers, throwConfetti, currencyCorrectAnswer],
-  // );
+      setRoundAnswsers((roundAnswers) => ({
+        ...roundAnswers,
+        selectedCurrency,
+      }));
+    },
+    [setRoundAnswsers, throwConfetti, currencyCorrectAnswer],
+  );
 
   const adRef = useRef<HTMLDivElement | null>(null);
 
@@ -149,9 +161,11 @@ export function QuizGameRoute() {
       <BackButtonContainer>
         <BackButton />
       </BackButtonContainer>
-      <BonusRoundTitle>Final Bonus Round - Population</BonusRoundTitle>
+      <BonusRoundTitle>
+        Final Bonus Round - Population & Currency
+      </BonusRoundTitle>
 
-      <div className="flex flex-row flex-wrap w-full pb-4 gap-2 max-w-lg">
+      <div className="my-3 flex flex-row flex-wrap w-full pb-4 gap-2 max-w-lg">
         <Question
           title={`What is the estimated population of ${todaysCountry.name}?`}
           icon={
@@ -166,43 +180,54 @@ export function QuizGameRoute() {
           correctAnswer={populationAnswer}
           onSelectAnswer={selectPopulation}
         />
-        {/* {selectedPopulation && (
-          <p className="my-0 text-base text-center w-full">
-            Population:{' '}
-            <span className="font-bold text-xl">{populationCorrectAnswer}</span>
-          </p>
-        )}
         {selectedPopulation && (
-          <>
-            <Question
-              title={`What is the currency in use in ${dailyCountryName}?`}
-              icon={<CurrencyIcon width="80" height="64" />}
-              choices={currencyChoices}
-              selectedAnswer={selectedCurrency}
-              correctAnswer={currencyCorrectAnswer}
-              onSelectAnswer={selectCurrency}
-            />
-            {selectedCurrency && (
-              <p className="my-0 text-base text-center w-full">
-                Currency:{' '}
-                <span className="font-bold text-xl">
-                  {currencyCorrectAnswer} ({currency_code})
-                </span>
-              </p>
-            )}
-          </>
-        )} */}
+          <div className="w-full flex justify-center my-1 items-center">
+            <p className="text-base text-center border rounded-full p-2 px-6 border-slate-500">
+              Population:{' '}
+              <span className="font-bold text-xl">{populationAnswer}</span>
+            </p>
+          </div>
+        )}
+        {selectedPopulation &&
+          todaysCountry.currencyData &&
+          currencyChoices &&
+          currencyCorrectAnswer && (
+            <>
+              <div className="h-[1px] w-4/6 bg-slate-500 opacity-30 left-1/2 my-3 -translate-x-1/2 relative" />
+              <Question
+                title={`What is the currency used in ${todaysCountry.name}?`}
+                icon={<CurrencyIcon width="80" height="64" />}
+                choices={currencyChoices}
+                selectedAnswer={selectedCurrency}
+                correctAnswer={currencyCorrectAnswer}
+                onSelectAnswer={selectCurrency}
+              />
+              {selectedCurrency && (
+                <div className="w-full flex justify-center my-1 items-center">
+                  <p className="text-base text-center border rounded-full p-2 px-6 border-slate-500">
+                    Currency:{' '}
+                    <span className="font-bold text-xl">
+                      {currencyCorrectAnswer} ({currencyCorrectCode})
+                    </span>
+                  </p>
+                </div>
+              )}
+            </>
+          )}
 
-        {selectedPopulation && (
-          <>
-            <div className="w-full flex justify-center mt-3">
-              <ShareButton />
-            </div>
-            <div className="w-full">
-              <WikipediaAndMapsLinks />
-            </div>
-          </>
-        )}
+        {selectedPopulation &&
+          (selectedCurrency ||
+            !todaysCountry.currencyData ||
+            !currencyChoices) && (
+            <>
+              <div className="w-full flex justify-center mt-3">
+                <ShareButton />
+              </div>
+              <div className="w-full">
+                <WikipediaAndMapsLinks />
+              </div>
+            </>
+          )}
       </div>
 
       <MobileView className="w-full flex flex-col">
@@ -224,7 +249,7 @@ export const Question: React.FC<{
   choices: string[];
   selectedAnswer?: string;
   correctAnswer: string;
-  onSelectAnswer?: (e: React.MouseEvent<HTMLElement>) => void;
+  onSelectAnswer?: (e: string) => void;
 }> = ({
   title,
   icon,
@@ -247,68 +272,18 @@ export const Question: React.FC<{
         </div>
       </div>
       <div className="flex flex-row flex-wrap w-full justify-center items-start">
-        {choices.map((choice, i) => {
-          const prefix = String.fromCharCode(65 + i);
-
-          return (
-            <div key={choice} className={`p-2 w-full md:w-1/2`}>
-              <StyledButton
-                data-value={choice}
-                choiceStatus={
-                  selectedAnswer && choice === correctAnswer
-                    ? ChoiceStatus.CORRECT
-                    : selectedAnswer === choice
-                      ? ChoiceStatus.INCORRECT
-                      : undefined
-                }
-                disabled={Boolean(selectedAnswer)}
-                onClick={onSelectAnswer}
-              >
-                <span className="mr-2">{prefix}.</span> {choice}
-              </StyledButton>
-            </div>
-          );
-        })}
+        <MultipleChoiceQuiz
+          columns={2}
+          mobileColumns={1}
+          answers={choices}
+          correct={correctAnswer}
+          onGuess={onSelectAnswer}
+          startingGuess={selectedAnswer}
+        />
       </div>
     </div>
   );
 };
-
-const StyledButton = styled('button')<{
-  choiceStatus?: ChoiceStatus | undefined;
-}>`
-  overflow: hidden;
-  padding-block: 5px;
-  padding-inline: 10px;
-  width: 100%;
-  border-width: 1px;
-  border-radius: 10px;
-
-  background-color: ${({ choiceStatus }) =>
-    choiceStatus === ChoiceStatus.CORRECT
-      ? 'green !important'
-      : choiceStatus === ChoiceStatus.INCORRECT
-        ? 'red !important'
-        : 'none'};
-  color: ${({ choiceStatus }) =>
-    choiceStatus === ChoiceStatus.CORRECT ? '#fff !important' : '#000'};
-
-  font-weight: bold;
-  text-align: left;
-
-  &:hover:not([disabled]) {
-    background-color: #aaa;
-  }
-
-  &[disabled] {
-    background-color: #ddd;
-    color: #666;
-  }
-
-  @media (prefers-color-scheme: dark) {
-    color: #fff;
-  }
-`;
 
 const BackButtonContainer = styled.div`
   display: flex;
