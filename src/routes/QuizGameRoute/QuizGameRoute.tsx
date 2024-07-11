@@ -78,6 +78,25 @@ const getPopulationChoices = ({ population }: { population: number }) => {
   return { boundaries, populationChoices, populationAnswer };
 };
 
+const getCurrencyData = ({
+  currencyData,
+}: {
+  currencyData:
+    | {
+        code: string;
+        name: string;
+        nameChoices: string[];
+      }
+    | undefined
+    | null;
+}) => {
+  return {
+    currencyCorrectCode: currencyData?.code,
+    currencyCorrectAnswer: currencyData?.name,
+    currencyChoices: currencyData?.nameChoices,
+  };
+};
+
 export function QuizGameRoute() {
   const { todaysCountry } = useTodaysCountry();
   const roundSeed = useDailySeed('fourth-bonus-round');
@@ -89,11 +108,11 @@ export function QuizGameRoute() {
     [todaysCountry],
   );
 
-  const {
-    code: currencyCorrectCode,
-    name: currencyCorrectAnswer,
-    nameChoices: currencyChoices,
-  } = useMemo(() => todaysCountry.currencyData, [todaysCountry]);
+  const { currencyCorrectCode, currencyCorrectAnswer, currencyChoices } =
+    useMemo(
+      () => getCurrencyData({ currencyData: todaysCountry.currencyData }),
+      [todaysCountry],
+    );
 
   const [{ selectedPopulation, selectedCurrency }, setRoundAnswsers] =
     useLocalStorage(roundSeed, {
@@ -167,37 +186,43 @@ export function QuizGameRoute() {
             <span className="font-bold text-xl">{populationAnswer}</span>
           </p>
         )}
-        {selectedPopulation && (
-          <>
-            <Question
-              title={`What is the currency used in ${todaysCountry.name}?`}
-              icon={<CurrencyIcon width="80" height="64" />}
-              choices={currencyChoices}
-              selectedAnswer={selectedCurrency}
-              correctAnswer={currencyCorrectAnswer}
-              onSelectAnswer={selectCurrency}
-            />
-            {selectedCurrency && (
-              <p className="my-0 text-base text-center w-full">
-                Currency:{' '}
-                <span className="font-bold text-xl">
-                  {currencyCorrectAnswer} ({currencyCorrectCode})
-                </span>
-              </p>
-            )}
-          </>
-        )}
+        {selectedPopulation &&
+          todaysCountry.currencyData &&
+          currencyChoices &&
+          currencyCorrectAnswer && (
+            <>
+              <Question
+                title={`What is the currency used in ${todaysCountry.name}?`}
+                icon={<CurrencyIcon width="80" height="64" />}
+                choices={currencyChoices}
+                selectedAnswer={selectedCurrency}
+                correctAnswer={currencyCorrectAnswer}
+                onSelectAnswer={selectCurrency}
+              />
+              {selectedCurrency && (
+                <p className="my-0 text-base text-center w-full">
+                  Currency:{' '}
+                  <span className="font-bold text-xl">
+                    {currencyCorrectAnswer} ({currencyCorrectCode})
+                  </span>
+                </p>
+              )}
+            </>
+          )}
 
-        {selectedPopulation && selectedCurrency && (
-          <>
-            <div className="w-full flex justify-center mt-3">
-              <ShareButton />
-            </div>
-            <div className="w-full">
-              <WikipediaAndMapsLinks />
-            </div>
-          </>
-        )}
+        {selectedPopulation &&
+          (selectedCurrency ||
+            !todaysCountry.currencyData ||
+            !currencyChoices) && (
+            <>
+              <div className="w-full flex justify-center mt-3">
+                <ShareButton />
+              </div>
+              <div className="w-full">
+                <WikipediaAndMapsLinks />
+              </div>
+            </>
+          )}
       </div>
 
       <MobileView className="w-full flex flex-col">
