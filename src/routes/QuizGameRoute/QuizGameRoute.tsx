@@ -90,10 +90,21 @@ const getCurrencyData = ({
     | undefined
     | null;
 }) => {
+  const allChoices = currencyData?.nameChoices ?? [];
+  // only add the correct answer if it's not already in the list
+  if (
+    allChoices.findIndex(
+      (a) => a.toLowerCase() === currencyData?.name.toLowerCase(),
+    ) === -1 &&
+    currencyData?.name
+  ) {
+    allChoices.push(currencyData?.name);
+  }
+
   return {
     currencyCorrectCode: currencyData?.code,
     currencyCorrectAnswer: currencyData?.name,
-    currencyChoices: currencyData?.nameChoices,
+    currencyChoices: allChoices.sort(() => Math.random() - 0.5),
   };
 };
 
