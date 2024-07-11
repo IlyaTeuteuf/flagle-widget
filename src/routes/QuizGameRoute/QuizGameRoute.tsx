@@ -14,7 +14,7 @@ import { useTodaysCountry } from '../../providers/TodaysCountryProvider';
 import { refreshCompleteAd } from '../../utils/ads';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-// const { ReactComponent: CurrencyIcon } = require('./CurrencyIcon.svg');
+const { ReactComponent: CurrencyIcon } = require('./CurrencyIcon.svg');
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { ReactComponent: PopulationIcon } = require('./PopulationIcon.svg');
 
@@ -81,13 +81,7 @@ const getPopulationChoices = ({ population }: { population: number }) => {
 export function QuizGameRoute() {
   const { todaysCountry } = useTodaysCountry();
   const roundSeed = useDailySeed('fourth-bonus-round');
-  const {
-    // currency_choices: currencyChoices,
-    // currency_name: currencyCorrectAnswer,
-    // currency_code,
-    populationChoices,
-    populationAnswer,
-  } = useMemo(
+  const { populationChoices, populationAnswer } = useMemo(
     () =>
       getPopulationChoices({
         population: todaysCountry.population,
@@ -95,13 +89,17 @@ export function QuizGameRoute() {
     [todaysCountry],
   );
 
-  const [{ selectedPopulation }, setRoundAnswsers] = useLocalStorage(
-    roundSeed,
-    {
+  const {
+    code: currencyCorrectCode,
+    name: currencyCorrectAnswer,
+    nameChoices: currencyChoices,
+  } = useMemo(() => todaysCountry.currencyData, [todaysCountry]);
+
+  const [{ selectedPopulation, selectedCurrency }, setRoundAnswsers] =
+    useLocalStorage(roundSeed, {
       selectedPopulation: undefined,
       selectedCurrency: undefined,
-    },
-  );
+    });
 
   const throwConfetti = useConfettiThrower();
   const selectPopulation = useCallback(
@@ -121,22 +119,23 @@ export function QuizGameRoute() {
     },
     [setRoundAnswsers, throwConfetti, populationAnswer],
   );
-  // const selectCurrency = useCallback(
-  //   (e) => {
-  //     const selectedCurrency =
-  //       e.currentTarget.closest('button')?.dataset?.value;
+  const selectCurrency = useCallback(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (e: any) => {
+      const selectedCurrency =
+        e.currentTarget.closest('button')?.dataset?.value;
 
-  //     if (selectedCurrency === currencyCorrectAnswer) {
-  //       throwConfetti();
-  //     }
+      if (selectedCurrency === currencyCorrectAnswer) {
+        throwConfetti();
+      }
 
-  //     setRoundAnswsers((roundAnswers) => ({
-  //       ...roundAnswers,
-  //       selectedCurrency,
-  //     }));
-  //   },
-  //   [setRoundAnswsers, throwConfetti, currencyCorrectAnswer],
-  // );
+      setRoundAnswsers((roundAnswers) => ({
+        ...roundAnswers,
+        selectedCurrency,
+      }));
+    },
+    [setRoundAnswsers, throwConfetti, currencyCorrectAnswer],
+  );
 
   const adRef = useRef<HTMLDivElement | null>(null);
 
@@ -149,7 +148,9 @@ export function QuizGameRoute() {
       <BackButtonContainer>
         <BackButton />
       </BackButtonContainer>
-      <BonusRoundTitle>Final Bonus Round - Population</BonusRoundTitle>
+      <BonusRoundTitle>
+        Final Bonus Round - Population & Currency
+      </BonusRoundTitle>
 
       <div className="flex flex-row flex-wrap w-full pb-4 gap-2 max-w-lg">
         <Question
@@ -166,16 +167,16 @@ export function QuizGameRoute() {
           correctAnswer={populationAnswer}
           onSelectAnswer={selectPopulation}
         />
-        {/* {selectedPopulation && (
+        {selectedPopulation && (
           <p className="my-0 text-base text-center w-full">
             Population:{' '}
-            <span className="font-bold text-xl">{populationCorrectAnswer}</span>
+            <span className="font-bold text-xl">{populationAnswer}</span>
           </p>
         )}
         {selectedPopulation && (
           <>
             <Question
-              title={`What is the currency in use in ${dailyCountryName}?`}
+              title={`What is the currency used in ${todaysCountry.name}?`}
               icon={<CurrencyIcon width="80" height="64" />}
               choices={currencyChoices}
               selectedAnswer={selectedCurrency}
@@ -186,14 +187,14 @@ export function QuizGameRoute() {
               <p className="my-0 text-base text-center w-full">
                 Currency:{' '}
                 <span className="font-bold text-xl">
-                  {currencyCorrectAnswer} ({currency_code})
+                  {currencyCorrectAnswer} ({currencyCorrectCode})
                 </span>
               </p>
             )}
           </>
-        )} */}
+        )}
 
-        {selectedPopulation && (
+        {selectedPopulation && selectedCurrency && (
           <>
             <div className="w-full flex justify-center mt-3">
               <ShareButton />

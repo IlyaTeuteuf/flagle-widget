@@ -223,7 +223,8 @@ export function BorderFlagGameRoute() {
         <>
           <CorrectAnswers answers={[correctAnswer]} />
           <NextRoundLink to="/bonus-round/4">
-            Bonus Round - {todaysCity?.flag ? '3/4' : '3/3'} - Population
+            Bonus Round - {todaysCity?.flag ? '3/4' : '3/3'} - Population &
+            Currency
           </NextRoundLink>
 
           <ShareButton />
