@@ -1,3 +1,4 @@
+import { MultipleChoiceQuiz } from '@pla324/teuteuf-multiple-choice-quiz';
 import { ReactElement, useCallback, useEffect, useMemo, useRef } from 'react';
 import { MobileView } from 'react-device-detect';
 import styled from 'styled-components';
@@ -9,7 +10,6 @@ import { ShareButton } from '../../components/ShareButton';
 import { WikipediaAndMapsLinks } from '../../components/WikipediaAndGmapsLinks';
 import { useConfettiThrower } from '../../hooks/useConfettiThrower';
 import { useDailySeed } from '../../hooks/useDailySeed';
-import { ChoiceStatus } from '../../hooks/useRoundState';
 import { useTodaysCountry } from '../../providers/TodaysCountryProvider';
 import { refreshCompleteAd } from '../../utils/ads';
 
@@ -104,10 +104,7 @@ export function QuizGameRoute() {
   const throwConfetti = useConfettiThrower();
   const selectPopulation = useCallback(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (e: any) => {
-      const selectedPopulation =
-        e.currentTarget.closest('button')?.dataset?.value;
-
+    (selectedPopulation: any) => {
       if (selectedPopulation === populationAnswer) {
         throwConfetti();
       }
@@ -121,10 +118,7 @@ export function QuizGameRoute() {
   );
   const selectCurrency = useCallback(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (e: any) => {
-      const selectedCurrency =
-        e.currentTarget.closest('button')?.dataset?.value;
-
+    (selectedCurrency: any) => {
       if (selectedCurrency === currencyCorrectAnswer) {
         throwConfetti();
       }
@@ -225,7 +219,7 @@ export const Question: React.FC<{
   choices: string[];
   selectedAnswer?: string;
   correctAnswer: string;
-  onSelectAnswer?: (e: React.MouseEvent<HTMLElement>) => void;
+  onSelectAnswer?: (e: string) => void;
 }> = ({
   title,
   icon,
@@ -248,68 +242,18 @@ export const Question: React.FC<{
         </div>
       </div>
       <div className="flex flex-row flex-wrap w-full justify-center items-start">
-        {choices.map((choice, i) => {
-          const prefix = String.fromCharCode(65 + i);
-
-          return (
-            <div key={choice} className={`p-2 w-full md:w-1/2`}>
-              <StyledButton
-                data-value={choice}
-                choiceStatus={
-                  selectedAnswer && choice === correctAnswer
-                    ? ChoiceStatus.CORRECT
-                    : selectedAnswer === choice
-                      ? ChoiceStatus.INCORRECT
-                      : undefined
-                }
-                disabled={Boolean(selectedAnswer)}
-                onClick={onSelectAnswer}
-              >
-                <span className="mr-2">{prefix}.</span> {choice}
-              </StyledButton>
-            </div>
-          );
-        })}
+        <MultipleChoiceQuiz
+          columns={2}
+          mobileColumns={1}
+          answers={choices}
+          correct={correctAnswer}
+          onGuess={onSelectAnswer}
+          startingGuess={selectedAnswer}
+        />
       </div>
     </div>
   );
 };
-
-const StyledButton = styled('button')<{
-  choiceStatus?: ChoiceStatus | undefined;
-}>`
-  overflow: hidden;
-  padding-block: 5px;
-  padding-inline: 10px;
-  width: 100%;
-  border-width: 1px;
-  border-radius: 10px;
-
-  background-color: ${({ choiceStatus }) =>
-    choiceStatus === ChoiceStatus.CORRECT
-      ? 'green !important'
-      : choiceStatus === ChoiceStatus.INCORRECT
-        ? 'red !important'
-        : 'none'};
-  color: ${({ choiceStatus }) =>
-    choiceStatus === ChoiceStatus.CORRECT ? '#fff !important' : '#000'};
-
-  font-weight: bold;
-  text-align: left;
-
-  &:hover:not([disabled]) {
-    background-color: #aaa;
-  }
-
-  &[disabled] {
-    background-color: #ddd;
-    color: #666;
-  }
-
-  @media (prefers-color-scheme: dark) {
-    color: #fff;
-  }
-`;
 
 const BackButtonContainer = styled.div`
   display: flex;
