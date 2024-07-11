@@ -165,7 +165,7 @@ export function QuizGameRoute() {
         Final Bonus Round - Population & Currency
       </BonusRoundTitle>
 
-      <div className="flex flex-row flex-wrap w-full pb-4 gap-2 max-w-lg">
+      <div className="my-3 flex flex-row flex-wrap w-full pb-4 gap-2 max-w-lg">
         <Question
           title={`What is the estimated population of ${todaysCountry.name}?`}
           icon={
@@ -181,16 +181,19 @@ export function QuizGameRoute() {
           onSelectAnswer={selectPopulation}
         />
         {selectedPopulation && (
-          <p className="my-0 text-base text-center w-full">
-            Population:{' '}
-            <span className="font-bold text-xl">{populationAnswer}</span>
-          </p>
+          <div className="w-full flex justify-center my-1 items-center">
+            <p className="text-base text-center border rounded-full p-2 px-6 border-slate-500">
+              Population:{' '}
+              <span className="font-bold text-xl">{populationAnswer}</span>
+            </p>
+          </div>
         )}
         {selectedPopulation &&
           todaysCountry.currencyData &&
           currencyChoices &&
           currencyCorrectAnswer && (
             <>
+              <div className="h-[1px] w-4/6 bg-slate-500 opacity-30 left-1/2 my-3 -translate-x-1/2 relative" />
               <Question
                 title={`What is the currency used in ${todaysCountry.name}?`}
                 icon={<CurrencyIcon width="80" height="64" />}
@@ -200,12 +203,14 @@ export function QuizGameRoute() {
                 onSelectAnswer={selectCurrency}
               />
               {selectedCurrency && (
-                <p className="my-0 text-base text-center w-full">
-                  Currency:{' '}
-                  <span className="font-bold text-xl">
-                    {currencyCorrectAnswer} ({currencyCorrectCode})
-                  </span>
-                </p>
+                <div className="w-full flex justify-center my-1 items-center">
+                  <p className="text-base text-center border rounded-full p-2 px-6 border-slate-500">
+                    Currency:{' '}
+                    <span className="font-bold text-xl">
+                      {currencyCorrectAnswer} ({currencyCorrectCode})
+                    </span>
+                  </p>
+                </div>
               )}
             </>
           )}
