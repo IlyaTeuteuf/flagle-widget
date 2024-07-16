@@ -11,10 +11,11 @@ const StyledSelect = styled(Select)`
 
 const Container = styled.div`
   width: 100%;
-  height: 38px;
-  padding: 0 8px;
-  margin-bottom: 1rem;
-  max-width: 376px;
+  height: 27px;
+  /* padding: 0 8px; */
+  /* margin-top: 1px; */
+  /* margin-bottom: 10px; */
+  max-width: 300px;
   transition:
     transform 0.4s ease-in-out,
     height 0.5s ease-in-out;
@@ -40,9 +41,35 @@ export const AnswerBox = ({ disabled, countries, onGuess }) => {
     [countries],
   );
 
+  const customStyles = {
+    control: (provided) => ({
+      ...provided,
+      height: '27px',
+      minHeight: '27px',
+    }),
+    valueContainer: (provided) => ({
+      ...provided,
+      height: '27px',
+      padding: '0 6px',
+    }),
+    input: (provided) => ({
+      ...provided,
+      margin: '0px',
+    }),
+    indicatorsContainer: (provided) => ({
+      ...provided,
+      height: '27px',
+    }),
+    menuList: (provided) => ({
+      ...provided,
+      height: '210px',
+    }),
+  };
+
   return (
     <Container disabled={disabled}>
       <StyledSelect
+        styles={customStyles}
         value={selectedOption}
         options={sortedCountries}
         onChange={handleSubmit}

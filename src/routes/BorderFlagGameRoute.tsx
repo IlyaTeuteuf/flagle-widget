@@ -1,15 +1,15 @@
 import { ImageQuiz } from '@pla324/teuteuf-image-quiz';
 import { useEffect, useMemo } from 'react';
 import { toast } from 'react-toastify';
-import styled from 'styled-components';
 
 import { getCountryFlagSvgUrl } from '../api/fetchDataFromCDN';
 import { AdnginEndMobile0 } from '../components/AdnginEndMobile0';
-import { BackButton } from '../components/BackButton';
+import AttemptsLeft from '../components/AttemptsLeft';
+// import { BackButton } from '../components/BackButton';
 import { BonusRoundTitle } from '../components/BonusRoundTitle';
-import { CorrectAnswers } from '../components/CorrectAnswers';
+// import { CorrectAnswers } from '../components/CorrectAnswers';
 import { NextRoundLink } from '../components/NextRoundLink';
-import { ShareButton } from '../components/ShareButton';
+// import { ShareButton } from '../components/ShareButton';
 import { useDailySeed } from '../hooks/useDailySeed';
 import { useRoundState } from '../hooks/useRoundState';
 import { useTodaysCountry } from '../providers/TodaysCountryProvider';
@@ -137,7 +137,7 @@ const useThirdBonusRound = ({
 };
 
 export function BorderFlagGameRoute() {
-  const { todaysCountry, countryList, todaysCity } = useTodaysCountry();
+  const { todaysCountry, countryList } = useTodaysCountry();
   const roundSeed = useDailySeed('third-bonus-round');
 
   const {
@@ -192,14 +192,14 @@ export function BorderFlagGameRoute() {
 
   return (
     <>
-      <BackButtonContainer>
+      {/* <BackButtonContainer>
         <BackButton />
-      </BackButtonContainer>
+      </BackButtonContainer> */}
       <BonusRoundTitle>
         Pick the flag of a country that neighbours {todaysCountry.name}
       </BonusRoundTitle>
 
-      <div className="max-w-lg mt-4">
+      <div className="max-w-lg mt-3">
         <ImageQuiz
           answerOptions={dailyChoicesOrder.map((countryName) => ({
             name: countryName,
@@ -216,18 +216,15 @@ export function BorderFlagGameRoute() {
       </div>
 
       {!isRoundComplete && (
-        <AttemptsLeft>You have {attemptsLeft} guesses remaining</AttemptsLeft>
+        <AttemptsLeft inlineEmoji={true} top={32}>{3-attemptsLeft}/3</AttemptsLeft>
       )}
 
       {isRoundComplete && (
         <>
-          <CorrectAnswers answers={[correctAnswer]} />
-          <NextRoundLink to="/bonus-round/4">
-            Bonus Round - {todaysCity?.flag ? '3/4' : '3/3'} - Population &
-            Currency
-          </NextRoundLink>
+          {/* <CorrectAnswers answers={[correctAnswer]} /> */}
+          <NextRoundLink to="/bonus-round/4" />
 
-          <ShareButton />
+          {/* <ShareButton /> */}
         </>
       )}
 
@@ -236,16 +233,16 @@ export function BorderFlagGameRoute() {
   );
 }
 
-const AttemptsLeft = styled('div')`
-  padding-top: 0.75rem;
-  padding-bottom: 0.75rem;
-  color: #888;
-`;
+// const AttemptsLeft = styled('div')`
+//   padding-top: 0.75rem;
+//   padding-bottom: 0.75rem;
+//   color: #888;
+// `;
 
-const BackButtonContainer = styled.div`
-  display: flex;
-  max-width: 376px;
-  padding: 0.4rem;
-  margin-bottom: 1rem;
-  width: 100%;
-`;
+// const BackButtonContainer = styled.div`
+//   display: flex;
+//   max-width: 376px;
+//   padding: 0.4rem;
+//   margin-bottom: 1rem;
+//   width: 100%;
+// `;

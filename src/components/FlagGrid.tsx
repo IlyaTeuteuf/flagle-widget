@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { getCountryFlagSvgUrl } from '../api/fetchDataFromCDN';
 
 const DELAY_TIME = 0.5;
-const FLAG_WIDTH = 300;
+const FLAG_WIDTH = 150;
 
 const Grid = styled.div<{ end?: boolean }>`
   transition: 1s;
@@ -13,7 +13,6 @@ const Grid = styled.div<{ end?: boolean }>`
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: auto 1fr;
   grid-gap: ${(props) => (props.end ? '0px' : '2px')};
-  z-index: ${(props) => (props.end ? 2 : 1)};
   width: fit-content;
 `;
 
@@ -80,6 +79,7 @@ const FlagContainer = styled.div`
   align-items: center;
   width: ${FLAG_WIDTH}px;
   min-height: ${(FLAG_WIDTH * 2) / 3}px; // 3:2 aspect ratio
+  margin: 10px 0;
 `;
 
 export function FlagGrid({

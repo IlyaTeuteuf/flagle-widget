@@ -4,10 +4,11 @@ import styled from 'styled-components';
 
 import { getCountryShapeSvgUrl } from '../api/fetchDataFromCDN';
 import { AdnginEndMobile0 } from '../components/AdnginEndMobile0';
-import { BackButton } from '../components/BackButton';
+import AttemptsLeft from '../components/AttemptsLeft';
+// import { BackButton } from '../components/BackButton';
 import { BonusRoundTitle } from '../components/BonusRoundTitle';
 import { NextRoundLink } from '../components/NextRoundLink';
-import { ShareButton } from '../components/ShareButton';
+// import { ShareButton } from '../components/ShareButton';
 import { useDailySeed } from '../hooks/useDailySeed';
 import { ChoiceStatus, useRoundState } from '../hooks/useRoundState';
 import { useTodaysCountry } from '../providers/TodaysCountryProvider';
@@ -103,13 +104,12 @@ export const ShapeGameRoute: React.FC = () => {
 
   return (
     <>
-      <BackButtonContainer>
+      {/* <BackButtonContainer>
         <BackButton />
-      </BackButtonContainer>
+      </BackButtonContainer> */}
       <BonusRoundTitle>
         What's the shape of {todaysCountry.name}?
       </BonusRoundTitle>
-
       <OutlineGrid>
         {dailyChoicesOrder.map((countryName, index) => (
           <CountryShape
@@ -133,34 +133,36 @@ export const ShapeGameRoute: React.FC = () => {
         ))}
       </OutlineGrid>
 
-      <p style={{ marginTop: '10px' }}>
-        Sponsored by WORLD<span style={{ color: '#16A34A' }}>L</span>E
-      </p>
-      <p>
-        Like this round?&nbsp;
-        <a
-          className="underline"
-          href={`https://worldle.teuteuf.fr`}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Try WORLD<span style={{ color: '#16A34A' }}>L</span>E
-        </a>
-      </p>
-
       {!isRoundComplete && (
-        <AttemptsLeft>You have {attemptsLeft} guesses remaining</AttemptsLeft>
+        // <AttemptsLeft>You have {attemptsLeft} guesses remaining</AttemptsLeft>
+        <AttemptsLeft>{2 - attemptsLeft}/2</AttemptsLeft>
       )}
 
       {isRoundComplete && (
         <>
           <NextRoundLink to={`/bonus-round/${todaysCity?.flag ? 2 : 3}`}>
-            {todaysCity?.flag
+            {/* {todaysCity?.flag
               ? 'Bonus Round - 2/4 - Pick the flag of the Capital'
-              : 'Bonus Round - 2/3 - Pick the flag of a neighbouring country'}
+              : 'Bonus Round - 2/3 - Pick the flag of a neighbouring country'} */}
+            <div className="bg-white pb-3 pt-2">
+              <p style={{ marginTop: '10px' }}>
+                Sponsored by WORLD<span style={{ color: '#16A34A' }}>L</span>E
+              </p>
+              <p>
+                Like this round?&nbsp;
+                <a
+                  className="underline"
+                  href={`https://worldle.teuteuf.fr`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Try WORLD<span style={{ color: '#16A34A' }}>L</span>E
+                </a>
+              </p>
+            </div>
           </NextRoundLink>
 
-          <ShareButton />
+          {/* <ShareButton /> */}
         </>
       )}
 
@@ -169,11 +171,19 @@ export const ShapeGameRoute: React.FC = () => {
   );
 };
 
-const AttemptsLeft = styled('div')`
-  padding-top: 0.75rem;
-  padding-bottom: 0.75rem;
-  color: #888;
-`;
+// const AttemptsLeft = styled('div')`
+//   display: block;
+//   font-size: 1em;
+//   position: absolute;
+//   top: 37px;
+//   right: 5px;
+//   border-radius: 10px;
+//   padding: 3px 5px;
+//   background: #ddd;
+//   span {
+//     font-weight: bold;
+//   }
+// `;
 
 const CountryShape: React.FC<{
   countryName: string;
@@ -209,8 +219,8 @@ const CountryShape: React.FC<{
       <Index>{index}.</Index>
       <CountrySVG
         src={getCountryShapeSvgUrl(countryCode)}
-        width="120"
-        height="120"
+        width="55"
+        height="55"
         alt=""
       />
     </StyledButton>
@@ -230,9 +240,9 @@ const Index = styled('div')`
   left: 7px;
   font-weight: bold;
   color: #000;
-  @media (prefers-color-scheme: dark) {
+  /* @media (prefers-color-scheme: dark) {
     color: #fff;
-  }
+  } */
 `;
 
 const IndexShadow = styled('div')`
@@ -241,28 +251,28 @@ const IndexShadow = styled('div')`
   left: 8px;
   font-weight: bold;
   color: #fff;
-  @media (prefers-color-scheme: dark) {
+  /* @media (prefers-color-scheme: dark) {
     color: #000;
-  }
+  } */
 `;
 
 const CountrySVG = styled('img')`
-  @media (prefers-color-scheme: dark) {
+  /* @media (prefers-color-scheme: dark) {
     filter: invert(1);
-  }
+  } */
 `;
 
 const OutlineGrid = styled.div`
   display: grid;
-  gap: 0.8rem;
+  gap: 0.5rem;
   grid-template-columns: repeat(2, 1fr);
-  margin: 1rem;
+  margin: 10px;
 `;
 
-const BackButtonContainer = styled.div`
-  display: flex;
-  max-width: 376px;
-  padding: 0.4rem;
-  margin-bottom: 1rem;
-  width: 100%;
-`;
+// const BackButtonContainer = styled.div`
+//   display: flex;
+//   max-width: 376px;
+//   padding: 0.4rem;
+//   /* margin-bottom: 1rem; */
+//   width: 100%;
+// `;

@@ -2,14 +2,14 @@ import { ImageQuiz } from '@pla324/teuteuf-image-quiz';
 import { useEffect, useMemo } from 'react';
 import { useHistory } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import styled from 'styled-components';
 
 import { AdnginEndMobile0 } from '../components/AdnginEndMobile0';
-import { BackButton } from '../components/BackButton';
+import AttemptsLeft from '../components/AttemptsLeft';
+// import { BackButton } from '../components/BackButton';
 import { BonusRoundTitle } from '../components/BonusRoundTitle';
-import { CorrectAnswers } from '../components/CorrectAnswers';
+// import { CorrectAnswers } from '../components/CorrectAnswers';
 import { NextRoundLink } from '../components/NextRoundLink';
-import { ShareButton } from '../components/ShareButton';
+// import { ShareButton } from '../components/ShareButton';
 import { useDailySeed } from '../hooks/useDailySeed';
 import { useRoundState } from '../hooks/useRoundState';
 import { useTodaysCountry } from '../providers/TodaysCountryProvider';
@@ -161,15 +161,15 @@ export function CapitalFlagGameRoute() {
 
   return (
     <>
-      <BackButtonContainer>
+      {/* <BackButtonContainer>
         <BackButton />
-      </BackButtonContainer>
+      </BackButtonContainer> */}
       <BonusRoundTitle>
         Pick the flag of the capital city of {todaysCountry.name}:{' '}
         {todaysCity?.names['en']}
       </BonusRoundTitle>
 
-      <div className="max-w-lg mt-4">
+      <div className="max-w-lg mt-3">
         <ImageQuiz
           answerOptions={dailyChoicesOrder.map((cityName) => ({
             name: cityName,
@@ -186,18 +186,16 @@ export function CapitalFlagGameRoute() {
       </div>
 
       {!isRoundComplete && (
-        <AttemptsLeft>You have {attemptsLeft} guesses remaining</AttemptsLeft>
+        <AttemptsLeft inlineEmoji={true} top={32}>{3-attemptsLeft}/3</AttemptsLeft>
       )}
 
       {isRoundComplete && (
         <>
           <div className="w-full flex justify-center mt-3">
-            <NextRoundLink to="/bonus-round/3">
-              Bonus Round - 3/4 - Pick the flag of a neighbouring country
-            </NextRoundLink>
+            <NextRoundLink to="/bonus-round/3" />
           </div>
-          <CorrectAnswers answers={[correctAnswer]} />
-          <ShareButton />
+          {/* <CorrectAnswers answers={[correctAnswer]} /> */}
+          {/* <ShareButton /> */}
         </>
       )}
 
@@ -206,16 +204,16 @@ export function CapitalFlagGameRoute() {
   );
 }
 
-const AttemptsLeft = styled('div')`
-  padding-top: 0.75rem;
-  padding-bottom: 0.75rem;
-  color: #888;
-`;
+// const AttemptsLeft = styled('div')`
+//   padding-top: 0.75rem;
+//   padding-bottom: 0.75rem;
+//   color: #888;
+// `;
 
-const BackButtonContainer = styled.div`
-  display: flex;
-  max-width: 376px;
-  padding: 0.4rem;
-  margin-bottom: 1rem;
-  width: 100%;
-`;
+// const BackButtonContainer = styled.div`
+//   display: flex;
+//   max-width: 376px;
+//   padding: 0.4rem;
+//   margin-bottom: 1rem;
+//   width: 100%;
+// `;

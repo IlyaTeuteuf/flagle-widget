@@ -3,11 +3,13 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
 
 import { AdnginEndMobile0 } from '../../components/AdnginEndMobile0';
-import { CorrectAnswers } from '../../components/CorrectAnswers';
+// import { Attempts } from './components/Attempts';
+import AttemptsLeft from '../../components/AttemptsLeft';
+// import { CorrectAnswers } from '../../components/CorrectAnswers';
 import { FlagGrid } from '../../components/FlagGrid';
 import { GuessList } from '../../components/GuessList';
 import { NextRoundLink } from '../../components/NextRoundLink';
-import { ShareButton } from '../../components/ShareButton';
+// import { ShareButton } from '../../components/ShareButton';
 import {
   MAX_ATTEMPTS,
   TILE_COUNT,
@@ -19,13 +21,13 @@ import { useGuessHistory } from '../../hooks/useGuessHistory';
 import { useTodaysCountry } from '../../providers/TodaysCountryProvider';
 import { shuffleWithSeed } from '../../utils/shuffleWithSeed';
 import { AnswerBox } from './components/AnswerBox';
-import { Attempts } from './components/Attempts';
 
 const TILE_INDICES = Array.from({ length: TILE_COUNT }, (_, i) => i);
 
 export function MainGameRoute() {
-  const { todaysCountry, countryList, todaysCity } = useTodaysCountry();
-  const [score, setScore] = useState('DNF');
+  // const { todaysCountry, countryList, todaysCity } = useTodaysCountry();
+  const { todaysCountry, countryList } = useTodaysCountry();
+  // const [score, setScore] = useState('DNF');
   const [flippedArray, setFlippedArray] = useState(Array(6).fill(false));
   const dayString = useDailySeed();
   const [randomOrder, setRandomOrder] = useState(() =>
@@ -96,10 +98,15 @@ export function MainGameRoute() {
       if (guesses[guesses.length - 1].distance === 0) {
         toast(`🎉 ${trueCountry} 🎉`, { autoClose: 3000 });
         throwConfetti();
-        setScore(guesses.length);
+        // setScore(guesses.length);
       } else {
-        toast(`🤔 ${trueCountry} 🤔`, { autoClose: 3000 });
-        setScore('DNF');
+        toast(
+          <div>
+            🤔<strong>{trueCountry}</strong>🤔
+          </div>,
+          { autoClose: 5000 },
+        );
+        // setScore('DNF');
       }
     }
   }, [
@@ -146,31 +153,37 @@ export function MainGameRoute() {
 
   return (
     <>
+      <AnswerBox disabled={end} countries={allCountryNames} onGuess={onGuess} />
       <FlagGrid
         end={end}
         countryInfo={{ code: todaysCountry.code }}
         flippedArray={flippedArray}
       ></FlagGrid>
-      <p className="mb-2 text-sm">
+      {/* <p className="mb-2 text-sm">
         {TILES_REVEALED_AT_START > 0 || guesses?.length > 0 ? (
           <br />
         ) : (
           `Make a guess to reveal the first tile`
         )}
-      </p>
-      <AnswerBox disabled={end} countries={allCountryNames} onGuess={onGuess} />
-      <Attempts score={score} attempts={guesses.length} max={MAX_ATTEMPTS} />
+      </p> */}
+      {!(TILES_REVEALED_AT_START > 0 || guesses?.length > 0) && (
+        <p className="mb-2 text-sm">Make a guess to reveal the first tile</p>
+      )}
+      {!end && (
+        <AttemptsLeft>{guesses.length}/{MAX_ATTEMPTS}</AttemptsLeft>
+        // <Attempts score={score} attempts={guesses.length} max={MAX_ATTEMPTS} />
+      )}
+
       <GuessList guesses={guesses} />
 
       {end && (
         <>
-          <CorrectAnswers answers={[trueCountry]} />
-          <NextRoundLink to="/bonus-round/1">
-            Bonus Round - {todaysCity?.flag ? '1/4' : '1/3'} - Pick the country
-            shape
-          </NextRoundLink>
+          {/* <CorrectAnswers answers={[trueCountry]} /> */}
+          <NextRoundLink to="/bonus-round/1" />
+          {/* Bonus Round - {todaysCity?.flag ? '1/4' : '1/3'} - Pick the country
+            shape */}
 
-          <ShareButton />
+          {/* <ShareButton /> */}
         </>
       )}
 

@@ -1,18 +1,19 @@
 import './App.css';
 import 'react-toastify/dist/ReactToastify.css';
 
-import Button from '@mui/material/Button';
+// import Button from '@mui/material/Button';
 import { lazy, Suspense, useEffect } from 'react';
 import { Redirect, Route, Switch } from 'react-router-dom';
-import { Flip, ToastContainer } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import styled from 'styled-components';
 
-import EmojiRender from './components/EmojiRender';
-import { HowToModal } from './components/HowToModal';
+// import EmojiRender from './components/EmojiRender';
+// import { HowToModal } from './components/HowToModal';
 import { NextRoundLink } from './components/NextRoundLink';
-import { SettingsLinkIcon } from './components/SettingsLinkIcon';
-import { StatsModal } from './components/StatsModal';
-import { Title, TitleBar, TitleBarDiv } from './components/Title';
+// import { SettingsLinkIcon } from './components/SettingsLinkIcon';
+// import { StatsModal } from './components/StatsModal';
+// import { Title, TitleBar, TitleBarDiv } from './components/Title';
+import { Title } from './components/Title';
 import { getDayString } from './hooks/useDailySeed';
 import { useMainGameCompleted } from './hooks/useMainGameCompleted';
 import { TodaysCountryProvider } from './providers/TodaysCountryProvider';
@@ -20,51 +21,53 @@ import { MainGameRoute } from './routes/MainGameRoute/MainGameRoute';
 import { SettingsRoute } from './routes/SettingsRoute';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const { ReactComponent: AngleIcon } = require('./angle_favicon.svg');
+// const { ReactComponent: AngleIcon } = require('./angle_favicon.svg');
 
 const CentreWrapper = styled.div`
   margin: 0;
   overflow: auto;
-  padding: 0;
-  width: 100%;
-  height: 100%;
+  width: 300px;
+  height: 250px;
+  padding: 0 5px;
   display: flex;
   justify-content: flex-start;
   align-items: center;
   flex-direction: column;
+  background-color: #fff;
+  position: relative;
 
-  @media (prefers-color-scheme: dark) {
+  /* @media (prefers-color-scheme: dark) {
     background-color: #121212;
-  }
+  } */
 `;
 
-const AdContainer = styled.div`
-  width: 100%;
-  margin-top: auto;
-  margin-bottom: 10px;
-  bottom: 0px;
-  display: flex;
-  justify-content: center;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-  @media (prefers-color-scheme: dark) {
-    color: #fff;
-  }
-`;
+// const AdContainer = styled.div`
+//   width: 100%;
+//   margin-top: auto;
+//   margin-bottom: 10px;
+//   bottom: 0px;
+//   display: flex;
+//   justify-content: center;
+//   flex-direction: column;
+//   align-items: center;
+//   gap: 10px;
+//   @media (prefers-color-scheme: dark) {
+//     color: #fff;
+//   }
+// `;
 
-const GameButton = styled(Button)`
-  span {
-    font-weight: bold;
-    text-transform: none;
-  }
-`;
+// const GameButton = styled(Button)`
+//   span {
+//     font-weight: bold;
+//     text-transform: none;
+//   }
+// `;
 
-const GamesContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  gap: 5px;
-`;
+// const GamesContainer = styled.div`
+//   display: flex;
+//   justify-content: center;
+//   gap: 5px;
+// `;
 
 const LazyFirstBonusRoundRoute = lazy(() =>
   import(
@@ -132,12 +135,12 @@ export function App() {
       <ToastContainer
         hideProgressBar
         position="top-center"
-        transition={Flip}
         autoClose={false}
+        style={{ position: 'absolute', width: '280px' }}
       />
       <CentreWrapper className="App-Center">
         <TodaysCountryProvider>
-          <TitleBar>
+          {/* <TitleBar>
             <TitleBarDiv />
             <TitleBarDiv justify="flex-end">
               <HowToModal />
@@ -151,7 +154,10 @@ export function App() {
             <TitleBarDiv>
               <SettingsLinkIcon />
             </TitleBarDiv>
-          </TitleBar>
+          </TitleBar> */}
+          <Title>
+            FLAG<span>LE</span>
+          </Title>
 
           <Suspense fallback="loading next bonus round…">
             <Switch>
@@ -202,7 +208,7 @@ export function App() {
           </Suspense>
         </TodaysCountryProvider>
 
-        <AdContainer>
+        {/* <AdContainer>
           <a
             href="https://docs.google.com/forms/d/e/1FAIpQLSe-UDln8IMcm53NHYPt2m_a0XDyW1b6SCt8d-wxEmqYcMxYqw/viewform"
             target="_blank"
@@ -282,28 +288,28 @@ export function App() {
               <span>WhereTaken</span>
             </GameButton>
           </GamesContainer>
-        </AdContainer>
+        </AdContainer> */}
 
-        <AdWrapperWrapper className="snigel-sidev">
+        {/* <AdWrapperWrapper className="snigel-sidev">
           <AdWrapper>
             <div id="adngin-sidebar_left-0"></div>
           </AdWrapper>
-        </AdWrapperWrapper>
+        </AdWrapperWrapper> */}
       </CentreWrapper>
     </div>
   );
 }
 
-const AdWrapperWrapper = styled('div')`
-  position: fixed;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  z-index: 200;
-`;
+// const AdWrapperWrapper = styled('div')`
+//   position: fixed;
+//   top: 0;
+//   bottom: 0;
+//   left: 0;
+//   z-index: 200;
+// `;
 
-const AdWrapper = styled('div')`
-  position: sticky;
-  padding: 20px 40px 20px 20px;
-  pointer-events: all;
-`;
+// const AdWrapper = styled('div')`
+//   position: sticky;
+//   padding: 20px 40px 20px 20px;
+//   pointer-events: all;
+// `;

@@ -21,10 +21,10 @@ const CountryGuess = styled.div`
   text-overflow: ellipsis;
   align-items: center;
   justify-content: center;
-  @media (prefers-color-scheme: dark) {
+  /* @media (prefers-color-scheme: dark) {
     background-color: #1f2023;
     color: #dadada;
-  }
+  } */
 `;
 
 const DistanceBox = styled.div`
@@ -37,10 +37,10 @@ const DistanceBox = styled.div`
   margin-right: 2px;
   align-items: center;
   justify-content: center;
-  @media (prefers-color-scheme: dark) {
+  /* @media (prefers-color-scheme: dark) {
     background-color: #1f2023;
     color: #dadada;
-  }
+  } */
 `;
 
 const ArrowBox = styled.div`
@@ -52,10 +52,10 @@ const ArrowBox = styled.div`
   grid-column: 9 / span 1;
   align-items: center;
   justify-content: center;
-  @media (prefers-color-scheme: dark) {
+  /* @media (prefers-color-scheme: dark) {
     background-color: #1f2023;
     color: #dadada;
-  }
+  } */
 `;
 
 export const GuessList: React.FC<{
@@ -65,10 +65,10 @@ export const GuessList: React.FC<{
 
   return (
     <>
-      {guesses.map((guess, index) => (
+      {guesses.slice(Math.max(guesses.length - 3, 0)).sort(()=>1).map((guess, index) => (
         <GuessLine key={index}>
           <CountryGuess>{guess.name}</CountryGuess>
-          <DistanceBox>{formatDistance(guess.distance)} </DistanceBox>
+          <DistanceBox>{formatDistance(guess.distance)}</DistanceBox>
           <ArrowBox>
             <EmojiRender text={getDirectionEmoji(guess)} />
           </ArrowBox>

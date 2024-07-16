@@ -1,12 +1,15 @@
 .App {
   text-align: center;
   flex: 1 0 auto;
+  position: relative;
+  overflow: hidden;
 }
 .App-Center {
   transition: all;
   transition-duration: 250ms;
   transition-timing-function: ease-in-out;
   padding-bottom: 0 !important;
+  overflow-x: hidden;
 }
 @media screen and (min-width: 768px) {
   .snigel-top-loaded .App-Center {
@@ -30,11 +33,11 @@
   }
 }
 
-@media (prefers-color-scheme: dark) {
+/* @media (prefers-color-scheme: dark) {
   body {
     color: #fff;
   }
-}
+} */
 
 .App-header {
   background-color: #282c34;
@@ -44,7 +47,7 @@
   align-items: center;
   justify-content: center;
   font-size: calc(10px + 2vmin);
-  color: white;
+  color: black;
 }
 
 .App-link {
@@ -73,4 +76,48 @@
     z-index: 0;
     display: none !important;
   }
+}
+
+/* Hacky way to modify SharedComponent style without creating a copy in the code */
+
+
+.grid.grid-cols-2.w-full.pb-4.gap-1.justify-center{
+  grid-template-columns: repeat(4, 1fr);
+  row-gap: 20px;
+}
+
+.grid.grid-cols-2.w-full.pb-4.gap-1.justify-center > div{
+  margin: 0;
+}
+
+.m-1.pl-1.pr-1.justify-center.items-center.text-xs.text-center.overflow-hidden.overflow-ellipsis.rounded.animate-slide-out{
+  display: none;
+}
+
+.flex.flex-row.flex-wrap.w-full.justify-center.items-start .w-full.flex.flex-col > div > div{
+  background: #ddd;
+  padding: 0;
+  margin: 5px;
+  width: 40%;
+  flex-grow: 1;
+  /* align-self: stretch; */
+  font-size: 16px;
+  border-radius: 10px;
+  height: 60px;
+}
+
+.flex.flex-row.flex-wrap.w-full.justify-center.items-start .w-full.flex.flex-col button {
+  height: 100%;
+  color: black;
+}
+
+.flex.flex-row.flex-wrap.w-full.justify-center.items-start .w-full.flex.flex-col button.bg-red-600,
+.flex.flex-row.flex-wrap.w-full.justify-center.items-start .w-full.flex.flex-col button.bg-green-700 {
+  color: #fff;
+}
+
+.flex.flex-row.flex-wrap.w-full.justify-center.items-start .w-full.flex.flex-col button:hover{
+  color: #fff;
+  border-color: #282c34;
+  background: #282c34;
 }

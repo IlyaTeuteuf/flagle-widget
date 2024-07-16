@@ -15,57 +15,57 @@
   <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
   <script>
     /* Snigelweb ads */
-    let breakpoint = "xsmall";
-    const w = window.innerWidth;
+    // let breakpoint = "xsmall";
+    // const w = window.innerWidth;
 
-    breakpoint = w >= 768 ? "small" : breakpoint;
-    breakpoint = w >= 960 ? "medium" : breakpoint;
-    breakpoint = w >= 1280 ? "large" : breakpoint;
-    breakpoint = w >= 1400 ? "xlarge" : breakpoint;
+    // breakpoint = w >= 768 ? "small" : breakpoint;
+    // breakpoint = w >= 960 ? "medium" : breakpoint;
+    // breakpoint = w >= 1280 ? "large" : breakpoint;
+    // breakpoint = w >= 1400 ? "xlarge" : breakpoint;
 
-    window.activeUnits = [];
+    // window.activeUnits = [];
 
-    switch (breakpoint.toLowerCase()) {
-      case "xsmall": // Small Mobile
-      case "small": // Portrait Tablet / Large Mobile
-        window.activeUnits = ["top_banner", "end_mobile"]; // Mobile Ad Units
-        break;
-      default:
-      case "medium":
-      case "xlarge":
-      case "large":
-        window.activeUnits = ["sidebar_left", "top_banner", "video"];
-        break;
-    }
+    // switch (breakpoint.toLowerCase()) {
+    //   case "xsmall": // Small Mobile
+    //   case "small": // Portrait Tablet / Large Mobile
+    //     window.activeUnits = ["top_banner", "end_mobile"]; // Mobile Ad Units
+    //     break;
+    //   default:
+    //   case "medium":
+    //   case "xlarge":
+    //   case "large":
+    //     window.activeUnits = ["sidebar_left", "top_banner", "video"];
+    //     break;
+    // }
 
-    window.activeAdUnits = [];
-    window.snigelPubConf = {
-      adengine: {
-        activeAdUnits: window.activeUnits,
-      },
-    };
+    // window.activeAdUnits = [];
+    // window.snigelPubConf = {
+    //   adengine: {
+    //     activeAdUnits: window.activeUnits,
+    //   },
+    // };
   </script>
   <script>
-    window.googletag = window.googletag || { cmd: [] };
+    // window.googletag = window.googletag || { cmd: [] };
 
-    function snigelLoaded() {
-      window.googletag.cmd.push(() => {
-        window.googletag.pubads().set("page_url", 'flagle.io');
-        window.googletag.pubads().addEventListener('slotRenderEnded', function(event) {
-          const slot_id = event.slot.getSlotElementId();
-          if (slot_id === 'adngin-top_banner-0') {
-              document.documentElement.classList.add('snigel-top-loaded');
-              document.documentElement.classList.add('snigel-'+breakpoint.toLowerCase());
-          }
-          /*if (event.slot.getSlotElementId() === "div-gpt-ad-123456789-0") {
-            var containsAd = !event.isEmpty;
-          }*/
-        });
-      });
-    }
+    // function snigelLoaded() {
+    //   window.googletag.cmd.push(() => {
+    //     window.googletag.pubads().set("page_url", 'flagle.io');
+    //     window.googletag.pubads().addEventListener('slotRenderEnded', function(event) {
+    //       const slot_id = event.slot.getSlotElementId();
+    //       if (slot_id === 'adngin-top_banner-0') {
+    //           document.documentElement.classList.add('snigel-top-loaded');
+    //           document.documentElement.classList.add('snigel-'+breakpoint.toLowerCase());
+    //       }
+    //       /*if (event.slot.getSlotElementId() === "div-gpt-ad-123456789-0") {
+    //         var containsAd = !event.isEmpty;
+    //       }*/
+    //     });
+    //   });
+    // }
   </script>
-  <script async data-cfasync="false" src="https://cdn.snigelweb.com/adengine/flagle.io/loader.js" id="snigel"
-    onload="snigelLoaded()" type="text/javascript"></script>
+  <!-- <script async data-cfasync="false" src="https://cdn.snigelweb.com/adengine/flagle.io/loader.js" id="snigel"
+    onload="snigelLoaded()" type="text/javascript"></script> -->
   <!-- Global site tag (gtag.js) - Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-V420SMFFK0"></script>
   <script>
@@ -95,9 +95,9 @@
 
   <div id="root"></div>
 
-  <div id="adngin-video-0"></div>
+  <!-- <div id="adngin-video-0"></div> -->
 
-  <div id="adngin-top_banner-0"></div>
+  <!-- <div id="adngin-top_banner-0"></div> -->
 
   <!-- California Consumer Privacy Act -->
   <div id="ccpa" style="text-align:center;cursor:pointer;display:none;">Do not share my Personal Information.</div>

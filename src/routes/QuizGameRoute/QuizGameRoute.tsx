@@ -1,22 +1,30 @@
 import { MultipleChoiceQuiz } from '@pla324/teuteuf-multiple-choice-quiz';
-import { ReactElement, useCallback, useEffect, useMemo, useRef } from 'react';
+import {
+  ReactElement,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { MobileView } from 'react-device-detect';
-import styled from 'styled-components';
+import { toast } from 'react-toastify';
+// import styled from 'styled-components';
 import { useLocalStorage } from 'usehooks-ts';
 
-import { BackButton } from '../../components/BackButton';
-import { BonusRoundTitle } from '../../components/BonusRoundTitle';
-import { ShareButton } from '../../components/ShareButton';
-import { WikipediaAndMapsLinks } from '../../components/WikipediaAndGmapsLinks';
+// import { BackButton } from '../../components/BackButton';
+// import { BonusRoundTitle } from '../../components/BonusRoundTitle';
+// import { ShareButton } from '../../components/ShareButton';
+// import { WikipediaAndMapsLinks } from '../../components/WikipediaAndGmapsLinks';
 import { useConfettiThrower } from '../../hooks/useConfettiThrower';
 import { useDailySeed } from '../../hooks/useDailySeed';
 import { useTodaysCountry } from '../../providers/TodaysCountryProvider';
 import { refreshCompleteAd } from '../../utils/ads';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const { ReactComponent: CurrencyIcon } = require('./CurrencyIcon.svg');
+// const { ReactComponent: CurrencyIcon } = require('./CurrencyIcon.svg');
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const { ReactComponent: PopulationIcon } = require('./PopulationIcon.svg');
+// const { ReactComponent: PopulationIcon } = require('./PopulationIcon.svg');
 
 function getPopulationAnswerIndex(actual: number, boundaries: number[]) {
   if (actual < boundaries[0]) return 0;
@@ -33,7 +41,7 @@ const getPopulationChoices = ({ population }: { population: number }) => {
 
   if (population < 10_000) {
     // Micro countries
-    populationChoices = ['Less than 25', '25 - 100', '100 - 2000', 'Over 2000'];
+    populationChoices = ['Under 25', '25 - 100', '100 - 2000', 'Over 2000'];
     boundaries = [25, 100, 2000];
   } else if (population < 2.5 * 1_000_000) {
     // Small countries
@@ -132,6 +140,9 @@ export function QuizGameRoute() {
     });
 
   const throwConfetti = useConfettiThrower();
+
+  const [fade, setFade] = useState(false);
+
   const selectPopulation = useCallback(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (selectedPopulation: any) => {
@@ -139,10 +150,14 @@ export function QuizGameRoute() {
         throwConfetti();
       }
 
-      setRoundAnswsers((roundAnswers) => ({
-        ...roundAnswers,
-        selectedPopulation,
-      }));
+      setFade(true);
+      setTimeout(() => {
+        setRoundAnswsers((roundAnswers) => ({
+          ...roundAnswers,
+          selectedPopulation,
+        }));
+        setFade(false);
+      }, 1000);
     },
     [setRoundAnswsers, throwConfetti, populationAnswer],
   );
@@ -167,53 +182,79 @@ export function QuizGameRoute() {
     refreshCompleteAd();
   }, []);
 
+  useEffect(() => {
+    const isCorrectAnswer = populationAnswer === selectedPopulation;
+    const emoji = isCorrectAnswer ? '🎉' : '🤔';
+    if (selectedPopulation)
+      toast(
+        <div>
+          <span>{emoji}</span>Population: <strong>{populationAnswer}</strong>
+          <span>{emoji}</span>
+        </div>,
+        { autoClose: 3000 },
+      );
+  }, [selectedPopulation, populationAnswer]);
+
+  useEffect(() => {
+    const isCorrectAnswer = currencyCorrectAnswer === selectedCurrency;
+    const emoji = isCorrectAnswer ? '🎉' : '🤔';
+    if (selectedCurrency)
+      toast(
+        <div>
+          <span>{emoji}</span>Currency:{' '}
+          <strong>
+            {currencyCorrectAnswer} ({currencyCorrectCode})
+          </strong>
+          <span>{emoji}</span>
+        </div>,
+        { autoClose: 3000 },
+      );
+  }, [selectedCurrency, currencyCorrectAnswer, currencyCorrectCode]);
+
   return (
     <>
-      <BackButtonContainer>
+      {/* <BackButtonContainer>
         <BackButton />
-      </BackButtonContainer>
-      <BonusRoundTitle>
+      </BackButtonContainer> */}
+      {/* <BonusRoundTitle>
         Final Bonus Round - Population & Currency
-      </BonusRoundTitle>
+      </BonusRoundTitle> */}
 
-      <div className="my-3 flex flex-row flex-wrap w-full pb-4 gap-2 max-w-lg">
-        <Question
-          title={`What is the estimated population of ${todaysCountry.name}?`}
-          icon={
-            <PopulationIcon
-              width="80"
-              height="64"
-              style={{ maxWidth: '100%', maxHeight: '100%' }}
-            />
-          }
-          choices={populationChoices}
-          selectedAnswer={selectedPopulation}
-          correctAnswer={populationAnswer}
-          onSelectAnswer={selectPopulation}
-        />
-        {selectedPopulation && (
+      <div
+        className={`flex flex-row flex-wrap w-full pb-4 gap-2 max-w-lg transition-opacity duration-1000 ${fade ? 'opacity-0' : ''}`}
+      >
+        {!selectedPopulation && (
+          <Question
+            title={`What is the estimated population of ${todaysCountry.name}?`}
+            choices={populationChoices}
+            selectedAnswer={selectedPopulation}
+            correctAnswer={populationAnswer}
+            onSelectAnswer={selectPopulation}
+          />
+        )}
+        {/* {selectedPopulation && (
           <div className="w-full flex justify-center my-1 items-center">
             <p className="text-base text-center border rounded-full p-2 px-6 border-slate-500">
               Population:{' '}
               <span className="font-bold text-xl">{populationAnswer}</span>
             </p>
           </div>
-        )}
+        )} */}
         {selectedPopulation &&
           todaysCountry.currencyData &&
           currencyChoices &&
           currencyCorrectAnswer && (
             <>
-              <div className="h-[1px] w-4/6 bg-slate-500 opacity-30 left-1/2 my-3 -translate-x-1/2 relative" />
+              {/* <div className="h-[1px] w-4/6 bg-slate-500 opacity-30 left-1/2 my-3 -translate-x-1/2 relative" /> */}
               <Question
                 title={`What is the currency used in ${todaysCountry.name}?`}
-                icon={<CurrencyIcon width="80" height="64" />}
+                // icon={<CurrencyIcon width="80" height="64" />}
                 choices={currencyChoices}
                 selectedAnswer={selectedCurrency}
                 correctAnswer={currencyCorrectAnswer}
                 onSelectAnswer={selectCurrency}
               />
-              {selectedCurrency && (
+              {/* {selectedCurrency && (
                 <div className="w-full flex justify-center my-1 items-center">
                   <p className="text-base text-center border rounded-full p-2 px-6 border-slate-500">
                     Currency:{' '}
@@ -222,11 +263,11 @@ export function QuizGameRoute() {
                     </span>
                   </p>
                 </div>
-              )}
+              )} */}
             </>
           )}
 
-        {selectedPopulation &&
+        {/* {selectedPopulation &&
           (selectedCurrency ||
             !todaysCountry.currencyData ||
             !currencyChoices) && (
@@ -238,8 +279,26 @@ export function QuizGameRoute() {
                 <WikipediaAndMapsLinks />
               </div>
             </>
-          )}
+          )} */}
       </div>
+
+      {selectedPopulation &&
+        (selectedCurrency ||
+          !todaysCountry.currencyData ||
+          !currencyChoices) && (
+          <a
+            className="backdrop-blur-sm bg-[#ffffffda] absolute z-50 p-1 text-2xl animate-scaleInOut left-0 right-0 top-28 text-center"
+            href="https://www.flagle.io/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Play{' '}
+            <span className="font-bold">
+              FLAG<span style={{ color: '#1a76d2' }}>LE</span>
+            </span>{' '}
+            now!
+          </a>
+        )}
 
       <MobileView className="w-full flex flex-col">
         <div
@@ -277,9 +336,7 @@ export const Question: React.FC<{
           style={{ width: '90%', maxWidth: '90%' }}
         >
           <div style={{ maxWidth: '25%' }}>{icon}</div>
-          <div className="flex-grow pl-2" style={{ lineHeight: 1.6 }}>
-            {title}
-          </div>
+          <div className="flex-grow pl-2">{title}</div>
         </div>
       </div>
       <div className="flex flex-row flex-wrap w-full justify-center items-start">
@@ -296,10 +353,10 @@ export const Question: React.FC<{
   );
 };
 
-const BackButtonContainer = styled.div`
-  display: flex;
-  max-width: 512px;
-  padding: 0.4rem;
-  margin-bottom: 1rem;
-  width: 100%;
-`;
+// const BackButtonContainer = styled.div`
+//   display: flex;
+//   max-width: 512px;
+//   padding: 0.4rem;
+//   margin-bottom: 1rem;
+//   width: 100%;
+// `;
