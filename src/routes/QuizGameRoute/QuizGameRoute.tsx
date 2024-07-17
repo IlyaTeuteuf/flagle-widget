@@ -146,11 +146,21 @@ export function QuizGameRoute() {
   const selectPopulation = useCallback(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (selectedPopulation: any) => {
-      if (selectedPopulation === populationAnswer) {
+      const isCorrectAnswer = selectedPopulation === populationAnswer;
+      if (isCorrectAnswer) {
         throwConfetti();
       }
 
       setFade(true);
+      const emoji = isCorrectAnswer ? '🎉' : '🤔';
+      toast(
+        <div>
+          <span>{emoji}</span>Population: <strong>{populationAnswer}</strong>
+          <span>{emoji}</span>
+        </div>,
+        { autoClose: 3000 },
+      );
+
       setTimeout(() => {
         setRoundAnswsers((roundAnswers) => ({
           ...roundAnswers,
@@ -164,41 +174,12 @@ export function QuizGameRoute() {
   const selectCurrency = useCallback(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (selectedCurrency: any) => {
-      if (selectedCurrency === currencyCorrectAnswer) {
+      const isCorrectAnswer = selectedCurrency === currencyCorrectAnswer;
+      if (isCorrectAnswer) {
         throwConfetti();
       }
 
-      setRoundAnswsers((roundAnswers) => ({
-        ...roundAnswers,
-        selectedCurrency,
-      }));
-    },
-    [setRoundAnswsers, throwConfetti, currencyCorrectAnswer],
-  );
-
-  const adRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    refreshCompleteAd();
-  }, []);
-
-  useEffect(() => {
-    const isCorrectAnswer = populationAnswer === selectedPopulation;
-    const emoji = isCorrectAnswer ? '🎉' : '🤔';
-    if (selectedPopulation)
-      toast(
-        <div>
-          <span>{emoji}</span>Population: <strong>{populationAnswer}</strong>
-          <span>{emoji}</span>
-        </div>,
-        { autoClose: 3000 },
-      );
-  }, [selectedPopulation, populationAnswer]);
-
-  useEffect(() => {
-    const isCorrectAnswer = currencyCorrectAnswer === selectedCurrency;
-    const emoji = isCorrectAnswer ? '🎉' : '🤔';
-    if (selectedCurrency)
+      const emoji = isCorrectAnswer ? '🎉' : '🤔';
       toast(
         <div>
           <span>{emoji}</span>Currency:{' '}
@@ -209,7 +190,25 @@ export function QuizGameRoute() {
         </div>,
         { autoClose: 3000 },
       );
-  }, [selectedCurrency, currencyCorrectAnswer, currencyCorrectCode]);
+
+      setRoundAnswsers((roundAnswers) => ({
+        ...roundAnswers,
+        selectedCurrency,
+      }));
+    },
+    [
+      setRoundAnswsers,
+      throwConfetti,
+      currencyCorrectAnswer,
+      currencyCorrectCode,
+    ],
+  );
+
+  const adRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    refreshCompleteAd();
+  }, []);
 
   return (
     <>
