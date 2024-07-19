@@ -35,6 +35,7 @@ const CentreWrapper = styled.div`
   flex-direction: column;
   background-color: #fff;
   position: relative;
+  overflow: hidden;
 
   /* @media (prefers-color-scheme: dark) {
     background-color: #121212;
