@@ -8,6 +8,7 @@ const StyledSelect = styled(Select)`
   :hover {
     border-color: #123456;
   }
+  z-index: 500;
 `;
 
 const Container = styled.div`
@@ -63,7 +64,7 @@ export const AnswerBox = ({ disabled, countries, onGuess }) => {
     }),
     menuList: (provided) => ({
       ...provided,
-      height: '210px',
+      height: '205px',
     }),
   };
 
