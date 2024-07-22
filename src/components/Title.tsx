@@ -22,6 +22,7 @@ export const TitleBar = styled.div`
 export const Title = styled.div`
   display: block;
   position: absolute;
+  z-index: 100;
   bottom: 0;
   right: 5px;
 

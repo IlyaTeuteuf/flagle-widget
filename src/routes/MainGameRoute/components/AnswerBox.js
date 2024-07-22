@@ -3,6 +3,7 @@ import Select from 'react-select';
 import styled, { css } from 'styled-components';
 
 const StyledSelect = styled(Select)`
+  margin-top: 5px;
   color: #000;
   :hover {
     border-color: #123456;

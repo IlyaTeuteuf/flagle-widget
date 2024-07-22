@@ -29,15 +29,19 @@ export const NextRoundLink: React.FC<PropsWithChildren<{ to: string }>> = ({
     //   </div>
     // </div>
 
-    <div className="absolute bottom-[calc(.6rem-2px)] mx-auto animate-slideInUp font-bold z-50 text-lg text-center">
+    <div className="absolute bottom-[7px] mx-auto animate-slideInUp font-bold z-50 text-lg text-center bg-white backdrop-blur-sm">
       {children}
-      <Link
-        to={to}
-        className="backdrop-blur-sm bg-[#c0dffbda] px-12 py-[.6rem] rounded-t-md cursor-pointer"
-      >
+      <Link to={to} className="cursor-pointer w-full px-[1.6rem] bg-[#c0dffbda] py-[.6rem] rounded-t-md">
         Next Round?
       </Link>
     </div>
+
+    // <div className="absolute bottom-[-1px] mx-auto animate-slideInUp font-bold z-50 text-lg text-center backdrop-blur-sm bg-[#c0dffbda] py-[.6rem] rounded-t-md">
+    //   {children}
+    //   <Link to={to} className="cursor-pointer w-full px-[1.6rem] py-[0.6rem]">
+    //     Next Round?
+    //   </Link>
+    // </div>
   );
 };
 

@@ -14,7 +14,7 @@ export const AdnginEndMobile0 = () => {
   return (
     <MobileView
       style={{
-        display: 'flex',
+        display: 'none',
         flexDirection: 'column',
         width: '100%',
       }}

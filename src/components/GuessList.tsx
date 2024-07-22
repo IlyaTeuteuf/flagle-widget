@@ -63,9 +63,19 @@ export const GuessList: React.FC<{
 }> = ({ guesses }) => {
   const { formatDistance } = useDistanceInUserUnit();
 
-  return (
-    <>
-      {guesses.slice(Math.max(guesses.length - 3, 0)).sort(()=>1).map((guess, index) => (
+
+  return guesses.length > 0 ? (
+    <div className="h-[78px] overflow-y-auto">
+      {/* {guesses.slice(Math.max(guesses.length - 3, 0)).map((guess, index) => (
+        <GuessLine key={index}>
+          <CountryGuess>{guess.name}</CountryGuess>
+          <DistanceBox>{formatDistance(guess.distance)}</DistanceBox>
+          <ArrowBox>
+            <EmojiRender text={getDirectionEmoji(guess)} />
+          </ArrowBox>
+        </GuessLine>
+      ))} */}
+      {guesses.slice().reverse().map((guess, index) => (
         <GuessLine key={index}>
           <CountryGuess>{guess.name}</CountryGuess>
           <DistanceBox>{formatDistance(guess.distance)}</DistanceBox>
@@ -74,6 +84,6 @@ export const GuessList: React.FC<{
           </ArrowBox>
         </GuessLine>
       ))}
-    </>
-  );
+    </div>
+  ) : null;
 };
